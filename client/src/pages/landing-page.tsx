@@ -67,10 +67,10 @@ const LandingPage = () => {
             </div>
           </div>
         </div>
-        <div className="wave-bottom">
-          <svg className="w-full h-16 md:h-24 text-white dark:text-gray-900 fill-current" viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,0 C240,95 480,95 720,30 C960,-35 1200,35 1440,70 L1440,100 L0,100 Z"></path>
-          </svg>
+        <div className="divider-container">
+          <div className="hero-divider">
+            <div className="divider-inner dark:bg-gray-900"></div>
+          </div>
         </div>
       </section>
 
@@ -254,10 +254,14 @@ const LandingPage = () => {
             </Link>
           </div>
         </div>
-        <div className="wave-top -mt-1">
-          <svg className="w-full h-16 md:h-24 text-gray-100 dark:text-gray-800 fill-current transform rotate-180" viewBox="0 0 1440 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,0 C240,95 480,95 720,30 C960,-35 1200,35 1440,70 L1440,100 L0,100 Z"></path>
-          </svg>
+        <div className="cta-divider">
+          <div className="divider-line">
+            <div className="divider-dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
         </div>
       </section>
 

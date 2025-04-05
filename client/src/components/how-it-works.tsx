@@ -20,7 +20,7 @@ const HowItWorks = () => {
               key={step.step} 
               style={{ animationDelay: `${index * 0.15}s` }}
             >
-              <div className="w-16 h-16 rounded-full bg-[#40A9BC] hover:bg-[#40A9BC]/90 dark:bg-[#40A9BC]/90 dark:hover:bg-[#40A9BC] flex items-center justify-center text-white text-xl font-bold mx-auto mb-4 shadow-md transition-all duration-300 float-animation">
+              <div className="w-16 h-16 rounded-full bg-[#40A9BC] hover:bg-[#40A9BC]/90 dark:bg-[#40A9BC]/90 dark:hover:bg-[#40A9BC] flex items-center justify-center text-white text-xl font-bold mx-auto mb-4 shadow-md transition-all duration-300">
                 {step.step}
               </div>
               <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">{step.title}</h3>
