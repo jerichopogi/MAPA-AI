@@ -222,8 +222,8 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   return (
     <div>
       {!generatedTrip ? (
-        <Card className="bg-white rounded-lg shadow-md mb-8 overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
+        <Card className="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-8 overflow-hidden border dark:border-gray-700">
+          <CardHeader className="bg-gradient-to-r from-[#40A9BC] to-[#40A9BC]/80 dark:from-[#40A9BC]/90 dark:to-[#40A9BC]/70 p-6 text-white">
             <CardTitle className="text-xl font-semibold">Generate Your Trip</CardTitle>
             <CardDescription className="text-white/80">Let our AI create a personalized travel plan just for you.</CardDescription>
           </CardHeader>
@@ -514,8 +514,8 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-white rounded-lg shadow-md mb-8 overflow-hidden">
-          <CardHeader className="bg-primary p-6 text-white">
+        <Card className="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-8 overflow-hidden border dark:border-gray-700">
+          <CardHeader className="bg-[#40A9BC] dark:bg-[#40A9BC]/90 p-6 text-white">
             <CardTitle className="text-xl font-semibold">{generatedTrip.tripName}</CardTitle>
             <CardDescription className="text-white/80">
               Powered by Google Gemini AI | Personalized just for you

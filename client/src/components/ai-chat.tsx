@@ -78,16 +78,16 @@ Experience-Focused Itinerary:
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-transparent dark:border-gray-700 ai-chat-animation">
       <div className="flex items-center mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4">
+        <div className="w-10 h-10 rounded-full bg-[#40A9BC]/10 dark:bg-[#40A9BC]/20 flex items-center justify-center text-[#40A9BC] mr-4 float-animation">
           <i className="fas fa-robot"></i>
         </div>
         <div>
-          <h3 className="font-semibold">
-            {APP_NAME.split("AI")[0]}<span className="text-primary">AI</span> Assistant
+          <h3 className="font-semibold text-gray-800 dark:text-white">
+            {APP_NAME.split("AI")[0]}<span className="text-[#40A9BC]">AI</span> Assistant
           </h3>
-          <p className="text-sm text-neutral-500">Powered by Google Gemini</p>
+          <p className="text-sm text-neutral-500 dark:text-gray-400">Powered by Google Gemini</p>
         </div>
       </div>
       
@@ -97,12 +97,12 @@ Experience-Focused Itinerary:
             key={message.id}
             className={`${
               message.role === "user" 
-                ? "bg-neutral-50" 
-                : "bg-primary/5 border-l-4 border-primary"
-            } rounded-lg p-4`}
+                ? "bg-neutral-50 dark:bg-gray-700" 
+                : "bg-[#40A9BC]/5 dark:bg-[#40A9BC]/10 border-l-4 border-[#40A9BC]"
+            } rounded-lg p-4 transition-all duration-300`}
           >
-            <p className="text-neutral-600 mb-2 whitespace-pre-line">{message.content}</p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-neutral-600 dark:text-gray-200 mb-2 whitespace-pre-line">{message.content}</p>
+            <p className="text-xs text-neutral-500 dark:text-gray-400">
               {message.role === "user" ? "You" : "Assistant"}, {formatTime(message.timestamp)}
             </p>
           </div>
@@ -114,7 +114,7 @@ Experience-Focused Itinerary:
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Ask MAPA AI a question..."
-          className="pr-10"
+          className="pr-10 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               handleSendMessage();
@@ -122,7 +122,7 @@ Experience-Focused Itinerary:
           }}
         />
         <Button 
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 h-auto text-primary bg-transparent hover:bg-transparent"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 h-auto text-[#40A9BC] bg-transparent hover:bg-transparent dark:text-[#40A9BC] dark:hover:bg-gray-600/20 animate-pulse-slow"
           onClick={handleSendMessage}
           disabled={!newMessage.trim()}
         >
