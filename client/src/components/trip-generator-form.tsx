@@ -104,6 +104,7 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
         duration: z.number().int().min(1, "Duration must be at least 1 day").max(30, "Duration must be 30 days or less"),
         budget: z.number().int().min(1, "Budget must be greater than 0"),
         preferences: z.array(z.string()).min(1, "Select at least one preference"),
+        selectedCities: z.array(z.string()).optional(),
       })
     ),
     defaultValues: {
@@ -114,6 +115,7 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
       duration: 5,
       budget: 50000,
       preferences: [],
+      selectedCities: [],
     },
   });
 
