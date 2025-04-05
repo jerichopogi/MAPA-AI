@@ -11,7 +11,6 @@ import { AuthProvider } from "@/hooks/use-auth";
 import LandingPage from "@/pages/landing-page";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import MyTrips from "@/pages/my-trips";
 import LocalSecrets from "@/pages/local-secrets";
@@ -65,9 +64,9 @@ function Router() {
 
   // Protected route component
   const ProtectedRoute = ({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) => {
-    // Redirect to auth page if not authenticated and not loading
+    // Redirect to login page if not authenticated and not loading
     if (!isLoading && !user) {
-      window.location.href = Routes.AUTH;
+      window.location.href = Routes.LOGIN;
       return null;
     }
 
@@ -80,7 +79,14 @@ function Router() {
       );
     }
 
-    // User is authenticated, render the component
+    // Check if user is verified
+    if (user && !user.isVerified) {
+      // Redirect to verify email page
+      window.location.href = Routes.VERIFY_EMAIL;
+      return null;
+    }
+
+    // User is authenticated and verified, render the component
     return <Component {...rest} />;
   };
 
@@ -93,7 +99,6 @@ function Router() {
         <Route path={Routes.HOME} component={LandingPage} />
         <Route path={Routes.LOGIN} component={Login} />
         <Route path={Routes.REGISTER} component={Register} />
-        <Route path={Routes.AUTH} component={AuthPage} />
         <Route path={Routes.FORGOT_PASSWORD} component={ForgotPassword} />
         <Route path={Routes.RESET_PASSWORD} component={ResetPassword} />
         <Route path={Routes.VERIFY_EMAIL} component={VerifyEmail} />
