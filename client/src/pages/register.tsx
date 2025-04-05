@@ -72,11 +72,17 @@ const Register = () => {
       
       toast({
         title: "Registration successful",
-        description: "Your account has been created. Welcome to MAPA AI!",
+        description: "Your account has been created. Please verify your email to continue.",
       });
       
       refetchUser();
-      setLocation(Routes.DASHBOARD);
+      
+      // Check if there's a redirect URL in the response and use it, otherwise fallback to VERIFY_EMAIL
+      if (result.redirect) {
+        setLocation(result.redirect);
+      } else {
+        setLocation(Routes.VERIFY_EMAIL);
+      }
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       if (error instanceof Error) {
