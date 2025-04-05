@@ -56,14 +56,117 @@ const LandingPage = () => {
                 </a>
               </div>
             </div>
-            <div className="md:w-1/2 flex justify-center slide-in-right">
-              <img
-                src="https://images.unsplash.com/photo-1590523278191-995cbcda646b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-                alt="Palawan, Philippines"
-                className="rounded-lg shadow-lg max-w-full h-auto float-animation"
-                width="500"
-                height="400"
-              />
+            <div className="md:w-1/2 slide-in-right">
+              <div className="masonry-gallery-wrapper">
+                <div className="masonry-gallery">
+                  <div className="masonry-column">
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1590523278191-995cbcda646b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Palawan, Philippines"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Palawan</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Rice terraces, Philippines"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Rice Terraces</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1588153191435-c890d9f0cf0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Manila skyline"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Manila</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="masonry-column masonry-column-offset">
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1551966775-a4ddc8df052b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Beach in Philippines"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>El Nido</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1573790387438-4da905039392?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Mountain in Philippines"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Mt. Mayon</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1566376069905-57287a804d17?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Filipino street food"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Local Cuisine</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1573883944369-cb343a7c2e2c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Chocolate Hills"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Chocolate Hills</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="masonry-column hidden lg:flex flex-col">
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1542201685-c0bce40f2c44?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Boracay Beach"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Boracay</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1580205315085-dd6d20e14e49?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Cebu City"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Cebu</span>
+                      </div>
+                    </div>
+                    <div className="masonry-item">
+                      <img
+                        src="https://images.unsplash.com/photo-1620286850653-8db687066da5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
+                        alt="Siargao Island"
+                        loading="lazy"
+                      />
+                      <div className="masonry-caption">
+                        <span>Siargao</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
