@@ -36,9 +36,12 @@ interface Currency {
 }
 
 interface Preference {
-  id: string;
+  id: number;
+  code: string;
   name: string;
   icon: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
@@ -120,13 +123,16 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   });
 
   // Handle preference toggle
-  const togglePreference = (preferenceId: string) => {
-    if (selectedPreferences.includes(preferenceId)) {
-      const updatedPreferences = selectedPreferences.filter(id => id !== preferenceId);
+  const togglePreference = (preferenceId: number) => {
+    // Convert to string for consistent handling
+    const preferenceIdStr = preferenceId.toString();
+    
+    if (selectedPreferences.includes(preferenceIdStr)) {
+      const updatedPreferences = selectedPreferences.filter(id => id !== preferenceIdStr);
       setSelectedPreferences(updatedPreferences);
       form.setValue("preferences", updatedPreferences);
     } else {
-      const updatedPreferences = [...selectedPreferences, preferenceId];
+      const updatedPreferences = [...selectedPreferences, preferenceIdStr];
       setSelectedPreferences(updatedPreferences);
       form.setValue("preferences", updatedPreferences);
     }
@@ -366,7 +372,7 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
                               type="button"
                               onClick={() => togglePreference(preference.id)}
                               className={`w-full flex flex-col items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
-                                selectedPreferences.includes(preference.id)
+                                selectedPreferences.includes(preference.id.toString())
                                   ? "border-primary bg-primary/5"
                                   : "border-neutral-200 hover:bg-neutral-50"
                               }`}
