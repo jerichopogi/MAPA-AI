@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { User } from "./lib/types";
 import { ApiEndpoints, Routes } from "./lib/constants";
 import { AuthProvider } from "@/hooks/use-auth";
+import { ThemeProvider } from "@/components/theme-provider";
 
 // Pages
 import LandingPage from "@/pages/landing-page";
@@ -144,10 +145,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
+      <ThemeProvider defaultTheme="system">
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
