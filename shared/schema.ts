@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -11,9 +12,13 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const usersRelations = relations(users, ({ many }) => ({
+  trips: many(trips),
+}));
+
 export const trips = pgTable("trips", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
+  userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   originAirport: text("origin_airport").notNull(),
   destinationCountry: text("destination_country").notNull(),
@@ -29,6 +34,13 @@ export const trips = pgTable("trips", {
   startDate: timestamp("start_date"),
   endDate: timestamp("end_date"),
 });
+
+export const tripsRelations = relations(trips, ({ one }) => ({
+  user: one(users, {
+    fields: [trips.userId],
+    references: [users.id],
+  }),
+}));
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
