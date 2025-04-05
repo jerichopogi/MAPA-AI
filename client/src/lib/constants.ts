@@ -39,17 +39,9 @@ export enum ApiEndpoints {
   CITIES = "/api/cities" // Base endpoint; use with country code: /api/cities/JPN
 }
 
-// Trip preferences
-export const PREFERENCES = [
-  { id: "landmarks", name: "Landmarks", icon: "landmark" },
-  { id: "food", name: "Food", icon: "utensils" },
-  { id: "shopping", name: "Shopping", icon: "shopping-bag" },
-  { id: "adventure", name: "Adventure", icon: "hiking" },
-  { id: "culture", name: "Culture", icon: "theater-masks" },
-  { id: "instagram", name: "Instagrammable Spots", icon: "camera" },
-  { id: "nature", name: "Nature", icon: "leaf" },
-  { id: "nightlife", name: "Nightlife", icon: "moon" }
-];
+// Note: Preferences are now fetched from the database via API
+// Previously defined as:
+// export const PREFERENCES = [...]
 
 // Partner Companies
 export const PARTNER_COMPANIES = [
@@ -186,16 +178,9 @@ export const TESTIMONIALS = [
   }
 ];
 
-// Currencies
-export const CURRENCIES = [
-  { code: "PHP", name: "Philippine Peso" },
-  { code: "USD", name: "US Dollar" },
-  { code: "EUR", name: "Euro" },
-  { code: "JPY", name: "Japanese Yen" },
-  { code: "SGD", name: "Singapore Dollar" },
-  { code: "KRW", name: "Korean Won" },
-  { code: "THB", name: "Thai Baht" }
-];
+// Note: Currencies are now fetched from the database via API
+// Previously defined as:
+// export const CURRENCIES = [...]
 
 // Months
 export const MONTHS = [

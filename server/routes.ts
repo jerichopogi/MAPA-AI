@@ -8,144 +8,6 @@ import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from 
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 
-// Sample data for demonstration
-const AIRPORTS = [
-  { code: "MNL", name: "Manila Ninoy Aquino International Airport" },
-  { code: "CEB", name: "Mactan-Cebu International Airport" },
-  { code: "DVO", name: "Francisco Bangoy International Airport (Davao)" },
-  { code: "ILO", name: "Iloilo International Airport" },
-  { code: "BCD", name: "Bacolod-Silay International Airport" },
-  { code: "CRK", name: "Clark International Airport" },
-  { code: "KLO", name: "Kalibo International Airport" },
-  { code: "TAG", name: "Tagbilaran Airport" },
-  { code: "PPS", name: "Puerto Princesa International Airport" },
-  { code: "ZAM", name: "Zamboanga International Airport" },
-  { code: "CGY", name: "Cagayan de Oro Airport" },
-  { code: "GES", name: "General Santos International Airport" },
-  { code: "LGP", name: "Legazpi Airport" },
-  { code: "BXU", name: "Butuan Airport" },
-  { code: "DGT", name: "Sibulan Airport (Dumaguete)" },
-  { code: "CYP", name: "Calbayog Airport" },
-  { code: "CBO", name: "Awang Airport (Cotabato)" },
-  { code: "SJI", name: "San Jose Airport (Mindoro)" },
-  { code: "TAC", name: "Daniel Z. Romualdez Airport (Tacloban)" },
-  { code: "TUG", name: "Tuguegarao Airport" }
-];
-
-const COUNTRIES = [
-  { code: "JPN", name: "Japan" },
-  { code: "KOR", name: "South Korea" },
-  { code: "SGP", name: "Singapore" },
-  { code: "THA", name: "Thailand" },
-  { code: "VNM", name: "Vietnam" },
-  { code: "MYS", name: "Malaysia" },
-  { code: "HKG", name: "Hong Kong" },
-  { code: "TWN", name: "Taiwan" },
-  { code: "AUS", name: "Australia" },
-  { code: "USA", name: "United States" },
-  { code: "CAN", name: "Canada" },
-  { code: "GBR", name: "United Kingdom" },
-  { code: "FRA", name: "France" },
-  { code: "ITA", name: "Italy" },
-  { code: "ESP", name: "Spain" }
-];
-
-const CURRENCIES = [
-  { code: "PHP", name: "Philippine Peso" },
-  { code: "USD", name: "US Dollar" },
-  { code: "EUR", name: "Euro" },
-  { code: "JPY", name: "Japanese Yen" },
-  { code: "SGD", name: "Singapore Dollar" },
-  { code: "KRW", name: "Korean Won" },
-  { code: "THB", name: "Thai Baht" }
-];
-
-const PREFERENCES = [
-  { id: "landmarks", name: "Landmarks", icon: "landmark" },
-  { id: "food", name: "Food", icon: "utensils" },
-  { id: "shopping", name: "Shopping", icon: "shopping-bag" },
-  { id: "adventure", name: "Adventure", icon: "hiking" },
-  { id: "culture", name: "Culture", icon: "theater-masks" },
-  { id: "instagram", name: "Instagrammable Spots", icon: "camera" },
-  { id: "nature", name: "Nature", icon: "leaf" },
-  { id: "nightlife", name: "Nightlife", icon: "moon" }
-];
-
-// Major cities data for popular countries
-const CITIES: Record<string, Array<{code: string, name: string}>> = {
-  "JPN": [
-    { code: "TYO", name: "Tokyo" },
-    { code: "OSA", name: "Osaka" },
-    { code: "KYO", name: "Kyoto" },
-    { code: "HIJ", name: "Hiroshima" },
-    { code: "SPK", name: "Sapporo" },
-    { code: "NGO", name: "Nagoya" },
-    { code: "FUK", name: "Fukuoka" },
-    { code: "KOB", name: "Kobe" },
-    { code: "OKA", name: "Okinawa" },
-    { code: "KIJ", name: "Niigata" }
-  ],
-  "KOR": [
-    { code: "SEL", name: "Seoul" },
-    { code: "PUS", name: "Busan" },
-    { code: "ICN", name: "Incheon" },
-    { code: "CJU", name: "Jeju" },
-    { code: "TAE", name: "Daegu" },
-    { code: "KWJ", name: "Gwangju" },
-    { code: "YNY", name: "Yangyang" }
-  ],
-  "SGP": [
-    { code: "SIN", name: "Singapore" }
-  ],
-  "THA": [
-    { code: "BKK", name: "Bangkok" },
-    { code: "CNX", name: "Chiang Mai" },
-    { code: "HKT", name: "Phuket" },
-    { code: "KBV", name: "Krabi" },
-    { code: "USM", name: "Koh Samui" },
-    { code: "UTP", name: "Pattaya" }
-  ],
-  "VNM": [
-    { code: "HAN", name: "Hanoi" },
-    { code: "SGN", name: "Ho Chi Minh City" },
-    { code: "DAD", name: "Da Nang" },
-    { code: "HPH", name: "Haiphong" },
-    { code: "NHA", name: "Nha Trang" },
-    { code: "CXR", name: "Cam Ranh" }
-  ],
-  "HKG": [
-    { code: "HKG", name: "Hong Kong" }
-  ],
-  "TWN": [
-    { code: "TPE", name: "Taipei" },
-    { code: "KHH", name: "Kaohsiung" },
-    { code: "RMQ", name: "Taichung" },
-    { code: "TNN", name: "Tainan" }
-  ],
-  "AUS": [
-    { code: "SYD", name: "Sydney" },
-    { code: "MEL", name: "Melbourne" },
-    { code: "BNE", name: "Brisbane" },
-    { code: "PER", name: "Perth" },
-    { code: "ADL", name: "Adelaide" },
-    { code: "CBR", name: "Canberra" },
-    { code: "CNS", name: "Cairns" },
-    { code: "OOL", name: "Gold Coast" }
-  ],
-  "USA": [
-    { code: "NYC", name: "New York" },
-    { code: "LAX", name: "Los Angeles" },
-    { code: "CHI", name: "Chicago" },
-    { code: "MIA", name: "Miami" },
-    { code: "SFO", name: "San Francisco" },
-    { code: "LAS", name: "Las Vegas" },
-    { code: "HNL", name: "Honolulu" },
-    { code: "SEA", name: "Seattle" },
-    { code: "BOS", name: "Boston" },
-    { code: "ATL", name: "Atlanta" }
-  ]
-};
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   setupAuth(app);
@@ -289,62 +151,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // In a real app, this is where we would call the Gemini API
       // For now, we'll simulate a response with a timed delay
-      setTimeout(() => {
-        const originAirport = AIRPORTS.find(a => a.code === tripInputData.originAirport)?.name || tripInputData.originAirport;
-        const destinationCountry = COUNTRIES.find(c => c.code === tripInputData.destinationCountry)?.name || tripInputData.destinationCountry;
-        
-        // Generate mock itineraries (in a real app this would come from Gemini)
-        const budgetItinerary = {
-          summary: `Budget-friendly ${tripInputData.duration}-day trip to ${destinationCountry}`,
-          dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
-            day: i + 1,
-            activities: [
-              { time: "Morning", description: `Budget activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
-              { time: "Afternoon", description: `Budget activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
-              { time: "Evening", description: `Budget activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
-            ],
-            accommodation: {
-              name: `Budget Accommodation for Day ${i+1}`,
-              cost: Math.floor(tripInputData.budget / (tripInputData.duration * 4))
-            },
-            meals: {
-              breakfast: { description: "Local breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 10)) },
-              lunch: { description: "Street food lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
-              dinner: { description: "Budget dinner", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 6)) }
-            }
-          })),
-          totalCost: Math.floor(tripInputData.budget * 0.8)
-        };
-        
-        const experienceItinerary = {
-          summary: `Experience-focused ${tripInputData.duration}-day trip to ${destinationCountry}`,
-          dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
-            day: i + 1,
-            activities: [
-              { time: "Morning", description: `Premium activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
-              { time: "Afternoon", description: `Premium activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
-              { time: "Evening", description: `Premium activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) }
-            ],
-            accommodation: {
-              name: `Luxury Accommodation for Day ${i+1}`,
-              cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2))
-            },
-            meals: {
-              breakfast: { description: "Hotel breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
-              lunch: { description: "Local restaurant lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 5)) },
-              dinner: { description: "Fine dining experience", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
-            }
-          })),
-          totalCost: Math.floor(tripInputData.budget * 1.2)
-        };
-        
-        const response = {
-          tripName: `Trip to ${destinationCountry}`,
-          budgetItinerary,
-          experienceItinerary
-        };
-        
-        res.json(response);
+      setTimeout(async () => {
+        try {
+          const airportResult = await storage.getAirportByCode(tripInputData.originAirport);
+          const countryResult = await storage.getCountryByCode(tripInputData.destinationCountry);
+          
+          const originAirport = airportResult?.name || tripInputData.originAirport;
+          const destinationCountry = countryResult?.name || tripInputData.destinationCountry;
+          
+          // Generate mock itineraries (in a real app this would come from Gemini)
+          const budgetItinerary = {
+            summary: `Budget-friendly ${tripInputData.duration}-day trip to ${destinationCountry}`,
+            dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
+              day: i + 1,
+              activities: [
+                { time: "Morning", description: `Budget activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
+                { time: "Afternoon", description: `Budget activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
+                { time: "Evening", description: `Budget activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
+              ],
+              accommodation: {
+                name: `Budget Accommodation for Day ${i+1}`,
+                cost: Math.floor(tripInputData.budget / (tripInputData.duration * 4))
+              },
+              meals: {
+                breakfast: { description: "Local breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 10)) },
+                lunch: { description: "Street food lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
+                dinner: { description: "Budget dinner", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 6)) }
+              }
+            })),
+            totalCost: Math.floor(tripInputData.budget * 0.8)
+          };
+          
+          const experienceItinerary = {
+            summary: `Experience-focused ${tripInputData.duration}-day trip to ${destinationCountry}`,
+            dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
+              day: i + 1,
+              activities: [
+                { time: "Morning", description: `Premium activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
+                { time: "Afternoon", description: `Premium activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
+                { time: "Evening", description: `Premium activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) }
+              ],
+              accommodation: {
+                name: `Luxury Accommodation for Day ${i+1}`,
+                cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2))
+              },
+              meals: {
+                breakfast: { description: "Hotel breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
+                lunch: { description: "Local restaurant lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 5)) },
+                dinner: { description: "Fine dining experience", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
+              }
+            })),
+            totalCost: Math.floor(tripInputData.budget * 1.2)
+          };
+          
+          const response = {
+            tripName: `Trip to ${destinationCountry}`,
+            budgetItinerary,
+            experienceItinerary
+          };
+          
+          res.json(response);
+        } catch (error) {
+          console.error("Error generating trip:", error);
+          res.status(500).json({ message: "Error generating trip data" });
+        }
       }, 2000); // Simulate API delay
       
     } catch (error) {
@@ -355,32 +225,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Reference data endpoints
-  app.get("/api/airports", (req, res) => {
-    res.json(AIRPORTS);
+  // Reference data endpoints - now using the database
+  app.get("/api/airports", async (req, res) => {
+    try {
+      const allAirports = await storage.getAllAirports();
+      res.json(allAirports);
+    } catch (error) {
+      console.error("Error fetching airports:", error);
+      res.status(500).json({ message: "Failed to fetch airports" });
+    }
   });
 
-  app.get("/api/countries", (req, res) => {
-    res.json(COUNTRIES);
+  app.get("/api/philippine-airports", async (req, res) => {
+    try {
+      const philippineAirports = await storage.getPhilippineAirports();
+      res.json(philippineAirports);
+    } catch (error) {
+      console.error("Error fetching Philippine airports:", error);
+      res.status(500).json({ message: "Failed to fetch Philippine airports" });
+    }
   });
 
-  app.get("/api/currencies", (req, res) => {
-    res.json(CURRENCIES);
+  app.get("/api/countries", async (req, res) => {
+    try {
+      const allCountries = await storage.getAllCountries();
+      res.json(allCountries);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+      res.status(500).json({ message: "Failed to fetch countries" });
+    }
   });
 
-  app.get("/api/preferences", (req, res) => {
-    res.json(PREFERENCES);
+  app.get("/api/currencies", async (req, res) => {
+    try {
+      const allCurrencies = await storage.getAllCurrencies();
+      res.json(allCurrencies);
+    } catch (error) {
+      console.error("Error fetching currencies:", error);
+      res.status(500).json({ message: "Failed to fetch currencies" });
+    }
+  });
+
+  app.get("/api/preferences", async (req, res) => {
+    try {
+      const allPreferences = await storage.getAllPreferences();
+      res.json(allPreferences);
+    } catch (error) {
+      console.error("Error fetching preferences:", error);
+      res.status(500).json({ message: "Failed to fetch preferences" });
+    }
   });
   
   // Get cities for a specific country
-  app.get("/api/cities/:countryCode", (req, res) => {
-    const countryCode = req.params.countryCode;
-    
-    if (CITIES[countryCode]) {
-      res.json(CITIES[countryCode]);
-    } else {
-      // If there's no cities data for this country, return an empty array
-      res.json([]);
+  app.get("/api/cities/:countryCode", async (req, res) => {
+    try {
+      const countryCode = req.params.countryCode;
+      const citiesForCountry = await storage.getCitiesByCountryCode(countryCode);
+      res.json(citiesForCountry);
+    } catch (error) {
+      console.error(`Error fetching cities for country ${req.params.countryCode}:`, error);
+      res.status(500).json({ message: `Failed to fetch cities for country ${req.params.countryCode}` });
     }
   });
 

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, primaryKey, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
@@ -55,6 +55,55 @@ export const tripsRelations = relations(trips, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// New tables for reference data that was previously hardcoded in routes.ts
+export const airports = pgTable("airports", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  isPhilippine: boolean("is_philippine").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const countries = pgTable("countries", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const currencies = pgTable("currencies", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const preferences = pgTable("preferences", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  icon: text("icon").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+});
+
+export const cities = pgTable("cities", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull(),
+  name: text("name").notNull(),
+  countryCode: text("country_code").notNull().references(() => countries.code),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at"),
+}, (table) => {
+  return {
+    // Create a unique constraint for code + countryCode
+    codeCountryUnique: unique().on(table.code, table.countryCode),
+  };
+});
 
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -131,10 +180,54 @@ export const verifyEmailSchema = z.object({
   token: z.string().min(1, "Token is required"),
 });
 
+// Create insert schemas for the new tables
+export const insertAirportSchema = createInsertSchema(airports).pick({
+  code: true,
+  name: true,
+  isPhilippine: true,
+  updatedAt: true,
+});
+
+export const insertCountrySchema = createInsertSchema(countries).pick({
+  code: true,
+  name: true,
+  updatedAt: true,
+});
+
+export const insertCurrencySchema = createInsertSchema(currencies).pick({
+  code: true,
+  name: true,
+  updatedAt: true,
+});
+
+export const insertPreferenceSchema = createInsertSchema(preferences).pick({
+  code: true,
+  name: true,
+  icon: true,
+  updatedAt: true,
+});
+
+export const insertCitySchema = createInsertSchema(cities).pick({
+  code: true,
+  name: true,
+  countryCode: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;
 export type Trip = typeof trips.$inferSelect;
+export type Airport = typeof airports.$inferSelect;
+export type InsertAirport = z.infer<typeof insertAirportSchema>;
+export type Country = typeof countries.$inferSelect;
+export type InsertCountry = z.infer<typeof insertCountrySchema>;
+export type Currency = typeof currencies.$inferSelect;
+export type InsertCurrency = z.infer<typeof insertCurrencySchema>;
+export type Preference = typeof preferences.$inferSelect;
+export type InsertPreference = z.infer<typeof insertPreferenceSchema>;
+export type City = typeof cities.$inferSelect;
+export type InsertCity = z.infer<typeof insertCitySchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type GenerateTripInput = z.infer<typeof generateTripSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;

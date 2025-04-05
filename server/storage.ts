@@ -1,6 +1,14 @@
-import { users, type User, type InsertUser, trips, type Trip, type InsertTrip } from "@shared/schema";
+import { 
+  users, type User, type InsertUser, 
+  trips, type Trip, type InsertTrip,
+  airports, type Airport, type InsertAirport,
+  countries, type Country, type InsertCountry,
+  currencies, type Currency, type InsertCurrency,
+  preferences, type Preference, type InsertPreference,
+  cities, type City, type InsertCity
+} from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -20,6 +28,43 @@ export interface IStorage {
   createTrip(trip: InsertTrip): Promise<Trip>;
   updateTrip(id: number, trip: Partial<InsertTrip>): Promise<Trip | undefined>;
   deleteTrip(id: number): Promise<boolean>;
+
+  // Reference data methods - Airports
+  getAllAirports(): Promise<Airport[]>;
+  getPhilippineAirports(): Promise<Airport[]>;
+  getAirportByCode(code: string): Promise<Airport | undefined>;
+  createAirport(airport: InsertAirport): Promise<Airport>;
+  updateAirport(id: number, airport: Partial<InsertAirport>): Promise<Airport>;
+  deleteAirport(id: number): Promise<boolean>;
+
+  // Reference data methods - Countries
+  getAllCountries(): Promise<Country[]>;
+  getCountryByCode(code: string): Promise<Country | undefined>;
+  createCountry(country: InsertCountry): Promise<Country>;
+  updateCountry(id: number, country: Partial<InsertCountry>): Promise<Country>;
+  deleteCountry(id: number): Promise<boolean>;
+
+  // Reference data methods - Currencies
+  getAllCurrencies(): Promise<Currency[]>;
+  getCurrencyByCode(code: string): Promise<Currency | undefined>;
+  createCurrency(currency: InsertCurrency): Promise<Currency>;
+  updateCurrency(id: number, currency: Partial<InsertCurrency>): Promise<Currency>;
+  deleteCurrency(id: number): Promise<boolean>;
+
+  // Reference data methods - Preferences
+  getAllPreferences(): Promise<Preference[]>;
+  getPreferenceByCode(code: string): Promise<Preference | undefined>;
+  createPreference(preference: InsertPreference): Promise<Preference>;
+  updatePreference(id: number, preference: Partial<InsertPreference>): Promise<Preference>;
+  deletePreference(id: number): Promise<boolean>;
+
+  // Reference data methods - Cities
+  getAllCities(): Promise<City[]>;
+  getCitiesByCountryCode(countryCode: string): Promise<City[]>;
+  getCityByCodeAndCountry(cityCode: string, countryCode: string): Promise<City | undefined>;
+  createCity(city: InsertCity): Promise<City>;
+  updateCity(id: number, city: Partial<InsertCity>): Promise<City>;
+  deleteCity(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -105,6 +150,188 @@ export class DatabaseStorage implements IStorage {
   async deleteTrip(id: number): Promise<boolean> {
     await db.delete(trips).where(eq(trips.id, id));
     return true; // PostgreSQL doesn't return count by default
+  }
+
+  // Reference data methods - Airports
+  async getAllAirports(): Promise<Airport[]> {
+    return await db.select().from(airports);
+  }
+
+  async getPhilippineAirports(): Promise<Airport[]> {
+    return await db.select().from(airports).where(eq(airports.isPhilippine, true));
+  }
+
+  async getAirportByCode(code: string): Promise<Airport | undefined> {
+    const [airport] = await db.select().from(airports).where(eq(airports.code, code));
+    return airport;
+  }
+
+  async createAirport(airport: InsertAirport): Promise<Airport> {
+    const [newAirport] = await db.insert(airports).values(airport).returning();
+    return newAirport;
+  }
+
+  async updateAirport(id: number, airportUpdate: Partial<InsertAirport>): Promise<Airport> {
+    const [updatedAirport] = await db
+      .update(airports)
+      .set(airportUpdate)
+      .where(eq(airports.id, id))
+      .returning();
+    
+    if (!updatedAirport) {
+      throw new Error(`Airport with ID ${id} not found`);
+    }
+    
+    return updatedAirport;
+  }
+
+  async deleteAirport(id: number): Promise<boolean> {
+    await db.delete(airports).where(eq(airports.id, id));
+    return true;
+  }
+
+  // Reference data methods - Countries
+  async getAllCountries(): Promise<Country[]> {
+    return await db.select().from(countries);
+  }
+
+  async getCountryByCode(code: string): Promise<Country | undefined> {
+    const [country] = await db.select().from(countries).where(eq(countries.code, code));
+    return country;
+  }
+
+  async createCountry(country: InsertCountry): Promise<Country> {
+    const [newCountry] = await db.insert(countries).values(country).returning();
+    return newCountry;
+  }
+
+  async updateCountry(id: number, countryUpdate: Partial<InsertCountry>): Promise<Country> {
+    const [updatedCountry] = await db
+      .update(countries)
+      .set(countryUpdate)
+      .where(eq(countries.id, id))
+      .returning();
+    
+    if (!updatedCountry) {
+      throw new Error(`Country with ID ${id} not found`);
+    }
+    
+    return updatedCountry;
+  }
+
+  async deleteCountry(id: number): Promise<boolean> {
+    await db.delete(countries).where(eq(countries.id, id));
+    return true;
+  }
+
+  // Reference data methods - Currencies
+  async getAllCurrencies(): Promise<Currency[]> {
+    return await db.select().from(currencies);
+  }
+
+  async getCurrencyByCode(code: string): Promise<Currency | undefined> {
+    const [currency] = await db.select().from(currencies).where(eq(currencies.code, code));
+    return currency;
+  }
+
+  async createCurrency(currency: InsertCurrency): Promise<Currency> {
+    const [newCurrency] = await db.insert(currencies).values(currency).returning();
+    return newCurrency;
+  }
+
+  async updateCurrency(id: number, currencyUpdate: Partial<InsertCurrency>): Promise<Currency> {
+    const [updatedCurrency] = await db
+      .update(currencies)
+      .set(currencyUpdate)
+      .where(eq(currencies.id, id))
+      .returning();
+    
+    if (!updatedCurrency) {
+      throw new Error(`Currency with ID ${id} not found`);
+    }
+    
+    return updatedCurrency;
+  }
+
+  async deleteCurrency(id: number): Promise<boolean> {
+    await db.delete(currencies).where(eq(currencies.id, id));
+    return true;
+  }
+
+  // Reference data methods - Preferences
+  async getAllPreferences(): Promise<Preference[]> {
+    return await db.select().from(preferences);
+  }
+
+  async getPreferenceByCode(code: string): Promise<Preference | undefined> {
+    const [preference] = await db.select().from(preferences).where(eq(preferences.code, code));
+    return preference;
+  }
+
+  async createPreference(preference: InsertPreference): Promise<Preference> {
+    const [newPreference] = await db.insert(preferences).values(preference).returning();
+    return newPreference;
+  }
+
+  async updatePreference(id: number, preferenceUpdate: Partial<InsertPreference>): Promise<Preference> {
+    const [updatedPreference] = await db
+      .update(preferences)
+      .set(preferenceUpdate)
+      .where(eq(preferences.id, id))
+      .returning();
+    
+    if (!updatedPreference) {
+      throw new Error(`Preference with ID ${id} not found`);
+    }
+    
+    return updatedPreference;
+  }
+
+  async deletePreference(id: number): Promise<boolean> {
+    await db.delete(preferences).where(eq(preferences.id, id));
+    return true;
+  }
+
+  // Reference data methods - Cities
+  async getAllCities(): Promise<City[]> {
+    return await db.select().from(cities);
+  }
+
+  async getCitiesByCountryCode(countryCode: string): Promise<City[]> {
+    return await db.select().from(cities).where(eq(cities.countryCode, countryCode));
+  }
+
+  async getCityByCodeAndCountry(cityCode: string, countryCode: string): Promise<City | undefined> {
+    const [city] = await db.select().from(cities)
+      .where(and(
+        eq(cities.code, cityCode),
+        eq(cities.countryCode, countryCode)
+      ));
+    return city;
+  }
+
+  async createCity(city: InsertCity): Promise<City> {
+    const [newCity] = await db.insert(cities).values(city).returning();
+    return newCity;
+  }
+
+  async updateCity(id: number, cityUpdate: Partial<InsertCity>): Promise<City> {
+    const [updatedCity] = await db
+      .update(cities)
+      .set(cityUpdate)
+      .where(eq(cities.id, id))
+      .returning();
+    
+    if (!updatedCity) {
+      throw new Error(`City with ID ${id} not found`);
+    }
+    
+    return updatedCity;
+  }
+
+  async deleteCity(id: number): Promise<boolean> {
+    await db.delete(cities).where(eq(cities.id, id));
+    return true;
   }
 }
 
@@ -262,6 +489,119 @@ export class MemStorage implements IStorage {
 
   async deleteTrip(id: number): Promise<boolean> {
     return this.trips.delete(id);
+  }
+
+  // Reference data methods - Airports (stub implementations for MemStorage)
+  async getAllAirports(): Promise<Airport[]> {
+    return [];
+  }
+
+  async getPhilippineAirports(): Promise<Airport[]> {
+    return [];
+  }
+
+  async getAirportByCode(code: string): Promise<Airport | undefined> {
+    return undefined;
+  }
+
+  async createAirport(airport: InsertAirport): Promise<Airport> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async updateAirport(id: number, airport: Partial<InsertAirport>): Promise<Airport> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async deleteAirport(id: number): Promise<boolean> {
+    return false;
+  }
+
+  // Reference data methods - Countries (stub implementations for MemStorage)
+  async getAllCountries(): Promise<Country[]> {
+    return [];
+  }
+
+  async getCountryByCode(code: string): Promise<Country | undefined> {
+    return undefined;
+  }
+
+  async createCountry(country: InsertCountry): Promise<Country> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async updateCountry(id: number, country: Partial<InsertCountry>): Promise<Country> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async deleteCountry(id: number): Promise<boolean> {
+    return false;
+  }
+
+  // Reference data methods - Currencies (stub implementations for MemStorage)
+  async getAllCurrencies(): Promise<Currency[]> {
+    return [];
+  }
+
+  async getCurrencyByCode(code: string): Promise<Currency | undefined> {
+    return undefined;
+  }
+
+  async createCurrency(currency: InsertCurrency): Promise<Currency> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async updateCurrency(id: number, currency: Partial<InsertCurrency>): Promise<Currency> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async deleteCurrency(id: number): Promise<boolean> {
+    return false;
+  }
+
+  // Reference data methods - Preferences (stub implementations for MemStorage)
+  async getAllPreferences(): Promise<Preference[]> {
+    return [];
+  }
+
+  async getPreferenceByCode(code: string): Promise<Preference | undefined> {
+    return undefined;
+  }
+
+  async createPreference(preference: InsertPreference): Promise<Preference> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async updatePreference(id: number, preference: Partial<InsertPreference>): Promise<Preference> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async deletePreference(id: number): Promise<boolean> {
+    return false;
+  }
+
+  // Reference data methods - Cities (stub implementations for MemStorage)
+  async getAllCities(): Promise<City[]> {
+    return [];
+  }
+
+  async getCitiesByCountryCode(countryCode: string): Promise<City[]> {
+    return [];
+  }
+
+  async getCityByCodeAndCountry(cityCode: string, countryCode: string): Promise<City | undefined> {
+    return undefined;
+  }
+
+  async createCity(city: InsertCity): Promise<City> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async updateCity(id: number, city: Partial<InsertCity>): Promise<City> {
+    throw new Error("Method not implemented in memory storage.");
+  }
+
+  async deleteCity(id: number): Promise<boolean> {
+    return false;
   }
 }
 
