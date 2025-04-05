@@ -319,8 +319,7 @@ function registerAuthRoutes(app: Express) {
         const { password, providerData, ...safeUser } = newUser;
         return res.status(201).json({ 
           message: "Registration successful. Please check your email to verify your account.", 
-          user: safeUser,
-          redirect: "/verify-email"
+          user: safeUser 
         });
       });
     } catch (error) {
