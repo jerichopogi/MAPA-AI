@@ -1,16 +1,9 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import session from "express-session";
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import MemoryStore from "memorystore";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodError } from "zod";
-import { generateTripSchema, insertUserSchema, loginSchema, contactSchema } from "@shared/schema";
-import bcrypt from "bcrypt";
-
-const SESSION_SECRET = process.env.SESSION_SECRET || "mapaai-secret-key";
+import { generateTripSchema, contactSchema } from "@shared/schema";
+import { setupAuth } from "./auth";
 
 // Sample data for demonstration
 const AIRPORTS = [
@@ -61,64 +54,8 @@ const PREFERENCES = [
 ];
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  const MemoryStoreSession = MemoryStore(session);
-
-  // Configure session
-  app.use(
-    session({
-      secret: SESSION_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      store: new MemoryStoreSession({
-        checkPeriod: 86400000 // prune expired entries every 24h
-      }),
-      cookie: {
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      }
-    })
-  );
-
-  // Initialize Passport
-  app.use(passport.initialize());
-  app.use(passport.session());
-
-  // Configure Passport with bcrypt password checking
-  passport.use(
-    new LocalStrategy(
-      { usernameField: "email" },
-      async (email, password, done) => {
-        try {
-          const user = await storage.getUserByEmail(email);
-          if (!user) {
-            return done(null, false, { message: "Incorrect email or password" });
-          }
-          
-          // Use bcrypt to verify password
-          const passwordMatch = await bcrypt.compare(password, user.password);
-          if (!passwordMatch) {
-            return done(null, false, { message: "Incorrect email or password" });
-          }
-          
-          return done(null, user);
-        } catch (err) {
-          return done(err);
-        }
-      }
-    )
-  );
-
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
-  });
-
-  passport.deserializeUser(async (id: number, done) => {
-    try {
-      const user = await storage.getUser(id);
-      done(null, user);
-    } catch (err) {
-      done(err);
-    }
-  });
+  // Setup authentication
+  setupAuth(app);
 
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: ZodError, res: Response) => {
@@ -133,92 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   };
 
-  // API Routes
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    // @ts-ignore
-    const { password, ...userWithoutPassword } = req.user;
-    res.json(userWithoutPassword);
-  });
-
-  app.post("/api/login", (req, res, next) => {
-    try {
-      const validatedData = loginSchema.parse(req.body);
-      
-      passport.authenticate("local", (err: any, user: any, info: any) => {
-        if (err) {
-          return next(err);
-        }
-        if (!user) {
-          return res.status(401).json({ message: info.message || "Authentication failed" });
-        }
-        req.logIn(user, (err) => {
-          if (err) {
-            return next(err);
-          }
-          const { password, ...safeUser } = user;
-          return res.json({ message: "Login successful", user: safeUser });
-        });
-      })(req, res, next);
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return handleZodError(error, res);
-      }
-      next(error);
-    }
-  });
-
-  app.post("/api/register", async (req, res, next) => {
-    try {
-      const userData = insertUserSchema.parse(req.body);
-      
-      // Check if user already exists
-      const existingUserByEmail = await storage.getUserByEmail(userData.email);
-      if (existingUserByEmail) {
-        return res.status(400).json({ message: "Email already in use" });
-      }
-      
-      const existingUserByUsername = await storage.getUserByUsername(userData.username);
-      if (existingUserByUsername) {
-        return res.status(400).json({ message: "Username already taken" });
-      }
-      
-      // Hash the password before storing
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-      
-      // Create user with hashed password
-      const newUser = await storage.createUser({
-        ...userData,
-        password: hashedPassword
-      });
-      
-      // Auto login after registration
-      req.logIn(newUser, (err) => {
-        if (err) {
-          return next(err);
-        }
-        const { password, ...safeUser } = newUser;
-        return res.status(201).json({ message: "Registration successful", user: safeUser });
-      });
-    } catch (error) {
-      if (error instanceof ZodError) {
-        return handleZodError(error, res);
-      }
-      next(error);
-    }
-  });
-
-  app.post("/api/logout", (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ message: "Logout failed" });
-      }
-      res.json({ message: "Logged out successfully" });
-    });
-  });
+  // API Routes are configured in auth.ts
 
   // Trips API
   app.get("/api/trips", async (req, res) => {

@@ -7,7 +7,10 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByGoogleId(googleId: string): Promise<User | undefined>;
+  getUserByFacebookId(facebookId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<User>): Promise<User>;
 
   // Trip methods
   getTrip(id: number): Promise<Trip | undefined>;
@@ -33,10 +36,34 @@ export class DatabaseStorage implements IStorage {
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user;
   }
+  
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.googleId, googleId));
+    return user;
+  }
+  
+  async getUserByFacebookId(facebookId: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.facebookId, facebookId));
+    return user;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const [user] = await db.insert(users).values(insertUser).returning();
     return user;
+  }
+  
+  async updateUser(id: number, userUpdate: Partial<User>): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set(userUpdate)
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    return updatedUser;
   }
 
   // Trip methods
@@ -107,16 +134,48 @@ export class MemStorage implements IStorage {
       (user) => user.email.toLowerCase() === email.toLowerCase(),
     );
   }
+  
+  async getUserByGoogleId(googleId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.googleId === googleId
+    );
+  }
+  
+  async getUserByFacebookId(facebookId: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.facebookId === facebookId
+    );
+  }
+  
+  async updateUser(id: number, userUpdate: Partial<User>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    const updatedUser = { ...user, ...userUpdate };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
     const now = new Date();
+    
+    // Create a properly typed User object with all required fields
     const user: User = { 
-      ...insertUser,
-      id, 
+      id,
+      username: insertUser.username,
+      email: insertUser.email,
+      password: insertUser.password || null,
+      fullName: insertUser.fullName || null,
       createdAt: now,
-      fullName: insertUser.fullName || null
+      googleId: insertUser.googleId || null,
+      facebookId: insertUser.facebookId || null,
+      profilePicture: insertUser.profilePicture || null,
+      providerData: insertUser.providerData || null
     };
+    
     this.users.set(id, user);
     return user;
   }

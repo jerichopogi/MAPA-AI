@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/layout/header";
+import { OAuthButton, OAuthDivider } from "@/components/oauth-buttons";
 
 // Extend the insertUserSchema with additional validation
 const registerSchema = insertUserSchema.extend({
@@ -143,24 +144,11 @@ const Register = () => {
             
             {/* Social Register Buttons */}
             <div className="space-y-3 mb-6">
-              <button className="flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                <i className="fab fa-facebook-f mr-3"></i>
-                Continue with Facebook
-              </button>
-              <button className="flex items-center justify-center w-full bg-white border border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg hover:bg-neutral-50 transition-colors">
-                <i className="fab fa-google mr-3 text-red-500"></i>
-                Continue with Google
-              </button>
+              <OAuthButton provider="facebook" className="py-2.5" />
+              <OAuthButton provider="google" className="py-2.5" />
             </div>
             
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-300"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-3 bg-neutral-50 text-neutral-500 text-sm">or register with email</span>
-              </div>
-            </div>
+            <OAuthDivider />
             
             {/* Register Form */}
             <Form {...form}>
@@ -168,19 +156,28 @@ const Register = () => {
                 <FormField
                   control={form.control}
                   name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input 
-                          {...field} 
-                          placeholder="Juan Dela Cruz" 
-                          className="w-full px-4 py-3 h-auto border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  render={({ field }) => {
+                    // Ensure field.value is a string
+                    const safeValue = typeof field.value === 'string' ? field.value : '';
+                    
+                    return (
+                      <FormItem>
+                        <FormLabel>Full Name</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Juan Dela Cruz" 
+                            className="w-full px-4 py-3 h-auto border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
+                            value={safeValue}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 
                 <FormField

@@ -7,9 +7,15 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"),  // Make password optional for OAuth users
   fullName: text("full_name"),
   createdAt: timestamp("created_at").defaultNow(),
+  // OAuth fields
+  googleId: text("google_id").unique(),
+  facebookId: text("facebook_id").unique(),
+  profilePicture: text("profile_picture"),
+  // For storing extra data from providers
+  providerData: jsonb("provider_data"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -47,6 +53,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
   fullName: true,
+  googleId: true,
+  facebookId: true,
+  profilePicture: true,
+  providerData: true,
 });
 
 export const insertTripSchema = createInsertSchema(trips).pick({

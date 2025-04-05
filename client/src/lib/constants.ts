@@ -7,6 +7,7 @@ export enum Routes {
   HOME = "/",
   LOGIN = "/login",
   REGISTER = "/register",
+  AUTH = "/auth",
   DASHBOARD = "/dashboard",
   MY_TRIPS = "/my-trips",
   LOCAL_SECRETS = "/local-secrets",

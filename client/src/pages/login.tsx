@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import Header from "@/components/layout/header";
+import { OAuthButton, OAuthDivider } from "@/components/oauth-buttons";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -117,24 +118,11 @@ const Login = () => {
             
             {/* Social Login Buttons */}
             <div className="space-y-3 mb-6">
-              <button className="flex items-center justify-center w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                <i className="fab fa-facebook-f mr-3"></i>
-                Continue with Facebook
-              </button>
-              <button className="flex items-center justify-center w-full bg-white border border-neutral-300 text-neutral-700 py-3 px-4 rounded-lg hover:bg-neutral-50 transition-colors">
-                <i className="fab fa-google mr-3 text-red-500"></i>
-                Continue with Google
-              </button>
+              <OAuthButton provider="facebook" className="py-2.5" />
+              <OAuthButton provider="google" className="py-2.5" />
             </div>
             
-            <div className="relative mb-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-neutral-300"></div>
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-3 bg-neutral-50 text-neutral-500 text-sm">or login with email</span>
-              </div>
-            </div>
+            <OAuthDivider />
             
             {/* Login Form */}
             <Form {...form}>

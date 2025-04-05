@@ -10,6 +10,7 @@ import { ApiEndpoints, Routes } from "./lib/constants";
 import LandingPage from "@/pages/landing-page";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import AuthPage from "@/pages/auth-page";
 import Dashboard from "@/pages/dashboard";
 import MyTrips from "@/pages/my-trips";
 import LocalSecrets from "@/pages/local-secrets";
@@ -22,7 +23,7 @@ import NotFound from "@/pages/not-found";
 // Create user context
 import { createContext } from "react";
 export const UserContext = createContext<{
-  user: User | null;
+  user: User | null | undefined;
   isLoading: boolean;
   refetchUser: () => void;
 }>({
@@ -33,7 +34,7 @@ export const UserContext = createContext<{
 
 function Router() {
   const [location] = useLocation();
-  const { data: user, isLoading, refetch: refetchUser } = useQuery<User | null>({
+  const { data: user, isLoading, refetch: refetchUser } = useQuery<User | null | undefined>({
     queryKey: [ApiEndpoints.USER],
     queryFn: async () => {
       try {
@@ -60,9 +61,9 @@ function Router() {
 
   // Protected route component
   const ProtectedRoute = ({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) => {
-    // Redirect to login if not authenticated and not loading
+    // Redirect to auth page if not authenticated and not loading
     if (!isLoading && !user) {
-      window.location.href = Routes.LOGIN;
+      window.location.href = Routes.AUTH;
       return null;
     }
 
@@ -88,6 +89,7 @@ function Router() {
         <Route path={Routes.HOME} component={LandingPage} />
         <Route path={Routes.LOGIN} component={Login} />
         <Route path={Routes.REGISTER} component={Register} />
+        <Route path={Routes.AUTH} component={AuthPage} />
         <Route path={Routes.DASHBOARD}>
           {(params) => <ProtectedRoute component={Dashboard} />}
         </Route>
