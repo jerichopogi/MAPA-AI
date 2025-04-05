@@ -9,6 +9,8 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   getUserByFacebookId(facebookId: string): Promise<User | undefined>;
+  getUserByVerificationToken(token: string): Promise<User | undefined>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, user: Partial<User>): Promise<User>;
 
@@ -44,6 +46,16 @@ export class DatabaseStorage implements IStorage {
   
   async getUserByFacebookId(facebookId: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.facebookId, facebookId));
+    return user;
+  }
+
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.verificationToken, token));
+    return user;
+  }
+
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.resetPasswordToken, token));
     return user;
   }
 
@@ -147,6 +159,18 @@ export class MemStorage implements IStorage {
     );
   }
   
+  async getUserByVerificationToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.verificationToken === token
+    );
+  }
+  
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    return Array.from(this.users.values()).find(
+      (user) => user.resetPasswordToken === token
+    );
+  }
+  
   async updateUser(id: number, userUpdate: Partial<User>): Promise<User> {
     const user = this.users.get(id);
     if (!user) {
@@ -173,7 +197,13 @@ export class MemStorage implements IStorage {
       googleId: insertUser.googleId || null,
       facebookId: insertUser.facebookId || null,
       profilePicture: insertUser.profilePicture || null,
-      providerData: insertUser.providerData || null
+      providerData: insertUser.providerData || null,
+      // Email verification and password reset fields
+      isVerified: false,
+      verificationToken: null,
+      verificationTokenExpires: null,
+      resetPasswordToken: null,
+      resetPasswordExpires: null
     };
     
     this.users.set(id, user);

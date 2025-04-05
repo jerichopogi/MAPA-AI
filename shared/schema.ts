@@ -16,6 +16,13 @@ export const users = pgTable("users", {
   profilePicture: text("profile_picture"),
   // For storing extra data from providers
   providerData: jsonb("provider_data"),
+  // Email verification fields
+  isVerified: boolean("is_verified").default(false).notNull(),
+  verificationToken: text("verification_token").unique(),
+  verificationTokenExpires: timestamp("verification_token_expires"),
+  // Password reset fields
+  resetPasswordToken: text("reset_password_token").unique(),
+  resetPasswordExpires: timestamp("reset_password_expires"),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -101,6 +108,26 @@ export const contactSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
 });
 
+// Forgot password schema
+export const forgotPasswordSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+// Reset password schema
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+// Verify email schema
+export const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertTrip = z.infer<typeof insertTripSchema>;
@@ -108,3 +135,6 @@ export type Trip = typeof trips.$inferSelect;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type GenerateTripInput = z.infer<typeof generateTripSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;

@@ -2,8 +2,11 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ZodError } from "zod";
-import { generateTripSchema, contactSchema } from "@shared/schema";
+import { generateTripSchema, contactSchema, forgotPasswordSchema, resetPasswordSchema, verifyEmailSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
+import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
+import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { promisify } from "util";
 
 // Sample data for demonstration
 const AIRPORTS = [
@@ -295,6 +298,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return handleZodError(error, res);
       }
       res.status(500).json({ message: "Failed to submit contact form" });
+    }
+  });
+
+  // ===== Email Verification and Password Reset Routes =====
+  
+  // Forgot Password - Request reset link
+  app.post("/api/forgot-password", async (req, res) => {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      
+      // Find user by email
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        // Don't reveal that the email doesn't exist for security reasons
+        return res.status(200).json({ 
+          message: "If your email is registered, you'll receive password reset instructions shortly." 
+        });
+      }
+      
+      // Send password reset email
+      const emailSent = await sendPasswordResetEmail(user);
+      
+      if (!emailSent) {
+        return res.status(500).json({ 
+          message: "Failed to send password reset email. Please try again later." 
+        });
+      }
+      
+      res.status(200).json({ 
+        message: "Password reset instructions have been sent to your email." 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return handleZodError(error, res);
+      }
+      res.status(500).json({ message: "An error occurred while processing your request." });
+    }
+  });
+  
+  // Reset Password - Using token and new password
+  app.post("/api/reset-password", async (req, res) => {
+    try {
+      const { token, password } = resetPasswordSchema.parse(req.body);
+      
+      // Find user by reset token
+      const user = await storage.getUserByResetToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired token." });
+      }
+      
+      // Check if token is expired
+      if (user.resetPasswordExpires && new Date() > user.resetPasswordExpires) {
+        return res.status(400).json({ message: "Password reset token has expired." });
+      }
+      
+      // Hash the new password
+      const scryptAsync = promisify(scrypt);
+      const salt = randomBytes(16).toString("hex");
+      const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+      const hashedPassword = `${buf.toString("hex")}.${salt}`;
+      
+      // Update user password and clear reset token
+      await storage.updateUser(user.id, {
+        password: hashedPassword,
+        resetPasswordToken: undefined,
+        resetPasswordExpires: undefined
+      });
+      
+      res.status(200).json({ message: "Password has been reset successfully. You can now log in with your new password." });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return handleZodError(error, res);
+      }
+      res.status(500).json({ message: "An error occurred while processing your request." });
+    }
+  });
+  
+  // Email Verification - Send verification email
+  app.post("/api/send-verification-email", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    try {
+      // @ts-ignore
+      const user = await storage.getUser(req.user.id);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      if (user.isVerified) {
+        return res.status(400).json({ message: "Email is already verified" });
+      }
+      
+      // Send verification email
+      const emailSent = await sendVerificationEmail(user);
+      
+      if (!emailSent) {
+        return res.status(500).json({ message: "Failed to send verification email" });
+      }
+      
+      res.status(200).json({ message: "Verification email has been sent" });
+    } catch (error) {
+      res.status(500).json({ message: "An error occurred while sending verification email" });
+    }
+  });
+  
+  // Email Verification - Verify email using token
+  app.post("/api/verify-email", async (req, res) => {
+    try {
+      const { token } = verifyEmailSchema.parse(req.body);
+      
+      // Find user by verification token
+      const user = await storage.getUserByVerificationToken(token);
+      
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired verification token" });
+      }
+      
+      // Check if token is expired
+      if (user.verificationTokenExpires && new Date() > user.verificationTokenExpires) {
+        return res.status(400).json({ message: "Verification token has expired" });
+      }
+      
+      // Update user as verified and clear verification token
+      await storage.updateUser(user.id, {
+        isVerified: true,
+        verificationToken: undefined,
+        verificationTokenExpires: undefined
+      });
+      
+      // Send welcome email
+      await sendWelcomeEmail(user);
+      
+      res.status(200).json({ message: "Email verified successfully" });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return handleZodError(error, res);
+      }
+      res.status(500).json({ message: "An error occurred while verifying email" });
     }
   });
 

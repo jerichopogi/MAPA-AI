@@ -14,7 +14,10 @@ export enum Routes {
   TRAVEL_INFO = "/travel-info",
   VISA_HELP = "/visa-help",
   TRAVEL_PACKAGE = "/travel-package",
-  TRIP_DETAILS = "/trip"
+  TRIP_DETAILS = "/trip",
+  FORGOT_PASSWORD = "/forgot-password",
+  RESET_PASSWORD = "/reset-password",
+  VERIFY_EMAIL = "/verify-email"
 }
 
 // API Endpoints
@@ -29,7 +32,11 @@ export enum ApiEndpoints {
   COUNTRIES = "/api/countries",
   CURRENCIES = "/api/currencies",
   PREFERENCES = "/api/preferences",
-  CONTACT = "/api/contact"
+  CONTACT = "/api/contact",
+  FORGOT_PASSWORD = "/api/forgot-password",
+  RESET_PASSWORD = "/api/reset-password",
+  SEND_VERIFICATION_EMAIL = "/api/send-verification-email",
+  VERIFY_EMAIL = "/api/verify-email"
 }
 
 // Trip preferences
