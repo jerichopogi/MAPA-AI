@@ -8,6 +8,7 @@ import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
 import MemoryStore from "memorystore";
+import { sendVerificationEmail } from "./email";
 
 // Use environment variables or default values for OAuth
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
@@ -300,13 +301,26 @@ function registerAuthRoutes(app: Express) {
         password: hashedPassword
       });
       
+      // Send verification email
+      try {
+        const emailSent = await sendVerificationEmail(newUser);
+        if (!emailSent) {
+          console.error("Failed to send verification email");
+        }
+      } catch (emailError) {
+        console.error("Error sending verification email:", emailError);
+      }
+      
       // Auto login
       req.logIn(newUser, (err) => {
         if (err) {
           return next(err);
         }
         const { password, providerData, ...safeUser } = newUser;
-        return res.status(201).json({ message: "Registration successful", user: safeUser });
+        return res.status(201).json({ 
+          message: "Registration successful. Please check your email to verify your account.", 
+          user: safeUser 
+        });
       });
     } catch (error) {
       next(error);

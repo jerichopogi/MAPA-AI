@@ -80,7 +80,14 @@ function Router() {
       );
     }
 
-    // User is authenticated, render the component
+    // Check if user is verified
+    if (user && !user.isVerified) {
+      // Redirect to verify email page
+      window.location.href = Routes.VERIFY_EMAIL;
+      return null;
+    }
+
+    // User is authenticated and verified, render the component
     return <Component {...rest} />;
   };
 

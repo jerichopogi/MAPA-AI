@@ -1,23 +1,26 @@
-import { MailService } from '@sendgrid/mail';
 import { User } from '@shared/schema';
 import crypto from 'crypto';
 import { storage } from './storage';
+import * as nodemailer from 'nodemailer';
 
-// Check for SendGrid API key
-if (!process.env.SENDGRID_API_KEY) {
-  console.warn("SENDGRID_API_KEY environment variable is not set. Email services will not work properly.");
-}
-
-// Initialize SendGrid mail service
-const mailService = new MailService();
-if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
+// Check for email credentials
+if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+  console.warn("Email credentials (EMAIL_USER, EMAIL_APP_PASSWORD) are not set. Email services will not work properly.");
 }
 
 // Base URL for application (should come from environment variable in production)
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@mapa-ai.com';
+const BASE_URL = process.env.BASE_URL || (process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.replit.app` : 'http://localhost:5000');
+const FROM_EMAIL = process.env.EMAIL_FROM || 'hello@myadventurousplanningally.com';
 const FROM_NAME = process.env.FROM_NAME || 'MAPA AI';
+
+// Create Nodemailer transport
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_APP_PASSWORD
+  }
+});
 
 interface EmailParams {
   to: string;
@@ -28,25 +31,25 @@ interface EmailParams {
 
 // Generic email sending function
 export async function sendEmail(params: EmailParams): Promise<boolean> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.error('SendGrid API key not set, cannot send email');
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_APP_PASSWORD) {
+    console.error('Email credentials not set, cannot send email');
     return false;
   }
 
   try {
-    await mailService.send({
+    // Send mail with Nodemailer
+    const info = await transporter.sendMail({
+      from: `"${FROM_NAME}" <${FROM_EMAIL}>`,
       to: params.to,
-      from: {
-        email: FROM_EMAIL,
-        name: FROM_NAME
-      },
       subject: params.subject,
       text: params.text,
       html: params.html || params.text
     });
+    
+    console.log('Email sent: %s', info.messageId);
     return true;
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('Error sending email:', error);
     return false;
   }
 }

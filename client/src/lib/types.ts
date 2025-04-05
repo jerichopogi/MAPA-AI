@@ -3,6 +3,9 @@ export interface User {
   username: string;
   email: string;
   fullName?: string;
+  isVerified?: boolean;
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
   createdAt: Date;
 }
 
