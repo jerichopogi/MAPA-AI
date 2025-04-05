@@ -58,127 +58,167 @@ const LandingPage = () => {
             </div>
             <div className="md:w-3/5 slide-in-right">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden p-3 hover:shadow-[0_20px_50px_rgba(64,169,188,0.3)] transition-all duration-500">
-                <div className="columns-2 md:columns-3 gap-3 space-y-3 max-h-[540px] overflow-hidden group">
-                  {/* First column images */}
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float">
-                    <img 
-                      src="https://images.unsplash.com/photo-1590523278191-995cbcda646b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Palawan, Philippines"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Palawan</span>
+                {/* Scrolling masonry gallery with images from around the world */}
+                <div className="gallery-scroll max-h-[540px] overflow-hidden">
+                  <div className="columns-2 md:columns-3 gap-3 space-y-3">
+                    {/* First set of images */}
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Paris, France"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Paris, France</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Bali, Indonesia"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Bali, Indonesia</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1543158181-e6f9f6712055?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Venice, Italy"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Venice, Italy</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1485738422979-f5c462d49f74?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Kyoto, Japan"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Kyoto, Japan</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Paris, France"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Eiffel Tower</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1493707553966-283afac8c358?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Santorini, Greece"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Santorini, Greece</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Venice, Italy"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Venice Canal</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1549144511-f099e773c147?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Grand Canyon, USA"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Grand Canyon, USA</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1528181304800-259b08848526?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Machu Picchu, Peru"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Machu Picchu, Peru</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1531572753322-ad063cecc140?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Tokyo, Japan"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Tokyo, Japan</span>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-slow">
-                    <img 
-                      src="https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Rice terraces, Philippines"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Rice Terraces</span>
+                  {/* Clone for infinite scroll */}
+                  <div className="columns-2 md:columns-3 gap-3 space-y-3 mt-3">
+                    {/* Cloned images for seamless scrolling */}
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Paris, France"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Paris, France</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float">
-                    <img 
-                      src="https://images.unsplash.com/photo-1588153191435-c890d9f0cf0f?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Manila skyline"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Manila</span>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Bali, Indonesia"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Bali, Indonesia</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Second column images */}
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-reverse">
-                    <img 
-                      src="https://images.unsplash.com/photo-1551966775-a4ddc8df052b?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="El Nido, Philippines"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">El Nido</span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-slow">
-                    <img 
-                      src="https://images.unsplash.com/photo-1573790387438-4da905039392?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Mt. Mayon"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Mt. Mayon</span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float">
-                    <img 
-                      src="https://images.unsplash.com/photo-1566376069905-57287a804d17?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Filipino street food"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Local Cuisine</span>
-                    </div>
-                  </div>
-                  
-                  {/* Third column images */}
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-reverse">
-                    <img 
-                      src="https://images.unsplash.com/photo-1573883944369-cb343a7c2e2c?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Chocolate Hills"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Chocolate Hills</span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-slow">
-                    <img 
-                      src="https://images.unsplash.com/photo-1542201685-c0bce40f2c44?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Boracay Beach"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Boracay</span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float">
-                    <img 
-                      src="https://images.unsplash.com/photo-1580205315085-dd6d20e14e49?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Cebu City"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Cebu</span>
-                    </div>
-                  </div>
-                  
-                  <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-float-reverse">
-                    <img 
-                      src="https://images.unsplash.com/photo-1620286850653-8db687066da5?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
-                      alt="Siargao Island"
-                      className="w-full h-auto object-cover transition-transform duration-500 hover:scale-110"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                      <span className="text-white font-medium p-3">Siargao</span>
+                    
+                    <div className="relative overflow-hidden rounded-lg shadow-md mb-3 hover:shadow-lg transition-all duration-300">
+                      <img 
+                        src="https://images.unsplash.com/photo-1543158181-e6f9f6712055?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80" 
+                        alt="Venice, Italy"
+                        className="w-full h-auto object-cover transition-transform duration-500 hover:scale-105"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+                        <span className="text-white font-medium p-3">Venice, Italy</span>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -235,7 +235,24 @@
     animation-delay: 0.6s;
   }
   
-  /* Custom styles for interactive elements */
+  /* Custom gallery scroll animation */
+  .gallery-scroll {
+    animation: galleryScroll 40s linear infinite;
+  }
+  
+  @keyframes galleryScroll {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(calc(-100% + 540px));
+    }
+  }
+  
+  /* Apply hover pause effect to the scrolling gallery */
+  .gallery-scroll:hover {
+    animation-play-state: paused;
+  }
 }
 
 @keyframes float {
