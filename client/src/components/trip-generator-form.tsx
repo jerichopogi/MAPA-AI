@@ -444,12 +444,12 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
                         <span className="animate-spin mr-2">
                           <i className="fas fa-spinner"></i>
                         </span>
-                        Generating...
+                        Generating with AI...
                       </>
                     ) : (
                       <>
                         <i className="fas fa-magic mr-2"></i>
-                        Generate Itineraries
+                        Generate AI Itineraries
                       </>
                     )}
                   </Button>
@@ -463,7 +463,7 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
           <CardHeader className="bg-primary p-6 text-white">
             <CardTitle className="text-xl font-semibold">{generatedTrip.tripName}</CardTitle>
             <CardDescription className="text-white/80">
-              Here are your personalized AI-generated itineraries
+              Powered by Google Gemini AI | Personalized just for you
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">

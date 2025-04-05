@@ -7,6 +7,7 @@ import { setupAuth } from "./auth";
 import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import { generateTripItinerary } from "./gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -140,88 +141,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate AI Trip
+  // Generate AI Trip with Google Gemini
   app.post("/api/generate-trip", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Not authenticated" });
     }
     
     try {
+      // Validate the trip input data
       const tripInputData = generateTripSchema.parse(req.body);
       
-      // In a real app, this is where we would call the Gemini API
-      // For now, we'll simulate a response with a timed delay
-      setTimeout(async () => {
-        try {
-          const airportResult = await storage.getAirportByCode(tripInputData.originAirport);
-          const countryResult = await storage.getCountryByCode(tripInputData.destinationCountry);
-          
-          const originAirport = airportResult?.name || tripInputData.originAirport;
-          const destinationCountry = countryResult?.name || tripInputData.destinationCountry;
-          
-          // Generate mock itineraries (in a real app this would come from Gemini)
-          const budgetItinerary = {
-            summary: `Budget-friendly ${tripInputData.duration}-day trip to ${destinationCountry}`,
-            dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
-              day: i + 1,
-              activities: [
-                { time: "Morning", description: `Budget activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
-                { time: "Afternoon", description: `Budget activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) },
-                { time: "Evening", description: `Budget activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
-              ],
-              accommodation: {
-                name: `Budget Accommodation for Day ${i+1}`,
-                cost: Math.floor(tripInputData.budget / (tripInputData.duration * 4))
-              },
-              meals: {
-                breakfast: { description: "Local breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 10)) },
-                lunch: { description: "Street food lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
-                dinner: { description: "Budget dinner", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 6)) }
-              }
-            })),
-            totalCost: Math.floor(tripInputData.budget * 0.8)
-          };
-          
-          const experienceItinerary = {
-            summary: `Experience-focused ${tripInputData.duration}-day trip to ${destinationCountry}`,
-            dailyPlans: Array.from({ length: tripInputData.duration }, (_, i) => ({
-              day: i + 1,
-              activities: [
-                { time: "Morning", description: `Premium activity ${i+1}A in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
-                { time: "Afternoon", description: `Premium activity ${i+1}B in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) },
-                { time: "Evening", description: `Premium activity ${i+1}C in ${destinationCountry}`, cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2)) }
-              ],
-              accommodation: {
-                name: `Luxury Accommodation for Day ${i+1}`,
-                cost: Math.floor(tripInputData.budget / (tripInputData.duration * 2))
-              },
-              meals: {
-                breakfast: { description: "Hotel breakfast", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 8)) },
-                lunch: { description: "Local restaurant lunch", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 5)) },
-                dinner: { description: "Fine dining experience", cost: Math.floor(tripInputData.budget / (tripInputData.duration * 3)) }
-              }
-            })),
-            totalCost: Math.floor(tripInputData.budget * 1.2)
-          };
-          
-          const response = {
-            tripName: `Trip to ${destinationCountry}`,
-            budgetItinerary,
-            experienceItinerary
-          };
-          
-          res.json(response);
-        } catch (error) {
-          console.error("Error generating trip:", error);
-          res.status(500).json({ message: "Error generating trip data" });
-        }
-      }, 2000); // Simulate API delay
+      // Get airport, country, and city details
+      const airportResult = await storage.getAirportByCode(tripInputData.originAirport);
+      const countryResult = await storage.getCountryByCode(tripInputData.destinationCountry);
       
+      // Get the names (not just codes) for better prompting
+      const originAirportName = airportResult?.name || tripInputData.originAirport;
+      const destinationCountryName = countryResult?.name || tripInputData.destinationCountry;
+      
+      // Get all selected city names if user provided them
+      let selectedCityNames: string[] = [];
+      if (tripInputData.selectedCities && tripInputData.selectedCities.length > 0) {
+        const citiesPromises = tripInputData.selectedCities.map(cityCode => 
+          storage.getCityByCodeAndCountry(cityCode, tripInputData.destinationCountry)
+        );
+        const cityResults = await Promise.all(citiesPromises);
+        selectedCityNames = cityResults
+          .filter(city => city !== undefined)
+          .map(city => city!.name); // Non-null assertion is safe due to filter
+      }
+      
+      try {
+        // Call the Gemini API to generate the trip itinerary
+        const response = await generateTripItinerary(
+          tripInputData,
+          originAirportName,
+          destinationCountryName,
+          selectedCityNames
+        );
+        
+        res.json(response);
+      } catch (error) {
+        console.error("Error generating trip with Gemini:", error);
+        res.status(500).json({ 
+          message: "Failed to generate trip with AI. Please try again later.",
+          error: error instanceof Error ? error.message : "Unknown error"
+        });
+      }
     } catch (error) {
       if (error instanceof ZodError) {
         return handleZodError(error, res);
       }
-      res.status(500).json({ message: "Failed to generate trip itinerary" });
+      res.status(500).json({ message: "Failed to process trip generation request" });
     }
   });
 
