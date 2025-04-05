@@ -158,11 +158,16 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   });
 
   const onSubmit = (data: TripGenerateInput) => {
-    // Make sure selectedCities is included in the data
+    // Make sure selectedCities and preferences are included in the data
     const tripData = {
       ...data,
-      selectedCities: selectedCities
+      selectedCities: selectedCities,
+      preferences: selectedPreferences.length > 0 ? selectedPreferences : data.preferences
     };
+    
+    // Log the data for debugging
+    console.log("Submitting trip data:", tripData);
+    
     generateTripMutation.mutate(tripData);
   };
 
