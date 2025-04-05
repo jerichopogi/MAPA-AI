@@ -8,6 +8,7 @@ import MemoryStore from "memorystore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ZodError } from "zod";
 import { generateTripSchema, insertUserSchema, loginSchema, contactSchema } from "@shared/schema";
+import bcrypt from "bcrypt";
 
 const SESSION_SECRET = process.env.SESSION_SECRET || "mapaai-secret-key";
 
@@ -81,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure Passport
+  // Configure Passport with bcrypt password checking
   passport.use(
     new LocalStrategy(
       { usernameField: "email" },
@@ -91,9 +92,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (!user) {
             return done(null, false, { message: "Incorrect email or password" });
           }
-          if (user.password !== password) {
+          
+          // Use bcrypt to verify password
+          const passwordMatch = await bcrypt.compare(password, user.password);
+          if (!passwordMatch) {
             return done(null, false, { message: "Incorrect email or password" });
           }
+          
           return done(null, user);
         } catch (err) {
           return done(err);
@@ -134,9 +139,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(401).json({ message: "Not authenticated" });
     }
     // @ts-ignore
-    const user = { ...req.user };
-    delete user.password; // Don't send password to client
-    res.json(user);
+    const { password, ...userWithoutPassword } = req.user;
+    res.json(userWithoutPassword);
   });
 
   app.post("/api/login", (req, res, next) => {
@@ -154,8 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (err) {
             return next(err);
           }
-          const safeUser = { ...user };
-          delete safeUser.password;
+          const { password, ...safeUser } = user;
           return res.json({ message: "Login successful", user: safeUser });
         });
       })(req, res, next);
@@ -182,16 +185,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already taken" });
       }
       
-      // Create user
-      const newUser = await storage.createUser(userData);
+      // Hash the password before storing
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+      
+      // Create user with hashed password
+      const newUser = await storage.createUser({
+        ...userData,
+        password: hashedPassword
+      });
       
       // Auto login after registration
       req.logIn(newUser, (err) => {
         if (err) {
           return next(err);
         }
-        const safeUser = { ...newUser };
-        delete safeUser.password;
+        const { password, ...safeUser } = newUser;
         return res.status(201).json({ message: "Registration successful", user: safeUser });
       });
     } catch (error) {

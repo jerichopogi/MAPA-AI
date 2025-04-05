@@ -64,8 +64,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteTrip(id: number): Promise<boolean> {
-    const result = await db.delete(trips).where(eq(trips.id, id));
-    return result.count > 0;
+    await db.delete(trips).where(eq(trips.id, id));
+    return true; // PostgreSQL doesn't return count by default
   }
 }
 
@@ -111,7 +111,12 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userIdCounter++;
     const now = new Date();
-    const user: User = { ...insertUser, id, createdAt: now };
+    const user: User = { 
+      ...insertUser,
+      id, 
+      createdAt: now,
+      fullName: insertUser.fullName || null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -130,7 +135,16 @@ export class MemStorage implements IStorage {
   async createTrip(insertTrip: InsertTrip): Promise<Trip> {
     const id = this.tripIdCounter++;
     const now = new Date();
-    const trip: Trip = { ...insertTrip, id, createdAt: now };
+    const trip: Trip = { 
+      ...insertTrip, 
+      id, 
+      createdAt: now,
+      status: insertTrip.status || "upcoming",
+      startDate: insertTrip.startDate || null,
+      endDate: insertTrip.endDate || null,
+      budgetItinerary: insertTrip.budgetItinerary || null,
+      experienceItinerary: insertTrip.experienceItinerary || null
+    };
     this.trips.set(id, trip);
     return trip;
   }
