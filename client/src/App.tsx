@@ -64,9 +64,11 @@ function Router() {
 
   // Protected route component
   const ProtectedRoute = ({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) => {
+    const [, setLocation] = useLocation();
+    
     // Redirect to login page if not authenticated and not loading
     if (!isLoading && !user) {
-      window.location.href = Routes.LOGIN;
+      setLocation(Routes.LOGIN);
       return null;
     }
 
@@ -82,7 +84,7 @@ function Router() {
     // Check if user is verified
     if (user && !user.isVerified) {
       // Redirect to verify email page
-      window.location.href = Routes.VERIFY_EMAIL;
+      setLocation(Routes.VERIFY_EMAIL);
       return null;
     }
 

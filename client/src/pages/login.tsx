@@ -1,10 +1,9 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { apiRequest } from "@/lib/queryClient";
-import { UserContext } from "@/App";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { LoginInput } from "@/lib/types";
 import { Routes, APP_NAME } from "@/lib/constants";
@@ -26,7 +25,7 @@ import { OAuthButton, OAuthDivider } from "@/components/oauth-buttons";
 
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { refetchUser } = useContext(UserContext);
+  const { loginMutation } = useAuth();
   const { toast } = useToast();
   const [_, setLocation] = useLocation();
 
@@ -41,27 +40,10 @@ const Login = () => {
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/login", data);
-      const result = await response.json();
-      
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-      
-      refetchUser();
+      await loginMutation.mutateAsync(data);
       setLocation(Routes.DASHBOARD);
     } catch (error) {
-      let errorMessage = "Invalid email or password";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: "Login failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      // Error is already handled by the loginMutation onError
     } finally {
       setIsLoading(false);
     }
