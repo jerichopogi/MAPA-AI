@@ -35,7 +35,8 @@ export enum ApiEndpoints {
   FORGOT_PASSWORD = "/api/forgot-password",
   RESET_PASSWORD = "/api/reset-password",
   SEND_VERIFICATION_EMAIL = "/api/send-verification-email",
-  VERIFY_EMAIL = "/api/verify-email"
+  VERIFY_EMAIL = "/api/verify-email",
+  CITIES = "/api/cities" // Base endpoint; use with country code: /api/cities/JPN
 }
 
 // Trip preferences

@@ -73,6 +73,12 @@ export interface TripGenerateInput {
   duration: number;
   budget: number;
   preferences: string[];
+  selectedCities?: string[];
+}
+
+export interface City {
+  code: string;
+  name: string;
 }
 
 export interface Activity {

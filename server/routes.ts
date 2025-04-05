@@ -14,7 +14,22 @@ const AIRPORTS = [
   { code: "CEB", name: "Mactan-Cebu International Airport" },
   { code: "DVO", name: "Francisco Bangoy International Airport (Davao)" },
   { code: "ILO", name: "Iloilo International Airport" },
-  { code: "BCD", name: "Bacolod-Silay International Airport" }
+  { code: "BCD", name: "Bacolod-Silay International Airport" },
+  { code: "CRK", name: "Clark International Airport" },
+  { code: "KLO", name: "Kalibo International Airport" },
+  { code: "TAG", name: "Tagbilaran Airport" },
+  { code: "PPS", name: "Puerto Princesa International Airport" },
+  { code: "ZAM", name: "Zamboanga International Airport" },
+  { code: "CGY", name: "Cagayan de Oro Airport" },
+  { code: "GES", name: "General Santos International Airport" },
+  { code: "LGP", name: "Legazpi Airport" },
+  { code: "BXU", name: "Butuan Airport" },
+  { code: "DGT", name: "Sibulan Airport (Dumaguete)" },
+  { code: "CYP", name: "Calbayog Airport" },
+  { code: "CBO", name: "Awang Airport (Cotabato)" },
+  { code: "SJI", name: "San Jose Airport (Mindoro)" },
+  { code: "TAC", name: "Daniel Z. Romualdez Airport (Tacloban)" },
+  { code: "TUG", name: "Tuguegarao Airport" }
 ];
 
 const COUNTRIES = [
@@ -55,6 +70,81 @@ const PREFERENCES = [
   { id: "nature", name: "Nature", icon: "leaf" },
   { id: "nightlife", name: "Nightlife", icon: "moon" }
 ];
+
+// Major cities data for popular countries
+const CITIES: Record<string, Array<{code: string, name: string}>> = {
+  "JPN": [
+    { code: "TYO", name: "Tokyo" },
+    { code: "OSA", name: "Osaka" },
+    { code: "KYO", name: "Kyoto" },
+    { code: "HIJ", name: "Hiroshima" },
+    { code: "SPK", name: "Sapporo" },
+    { code: "NGO", name: "Nagoya" },
+    { code: "FUK", name: "Fukuoka" },
+    { code: "KOB", name: "Kobe" },
+    { code: "OKA", name: "Okinawa" },
+    { code: "KIJ", name: "Niigata" }
+  ],
+  "KOR": [
+    { code: "SEL", name: "Seoul" },
+    { code: "PUS", name: "Busan" },
+    { code: "ICN", name: "Incheon" },
+    { code: "CJU", name: "Jeju" },
+    { code: "TAE", name: "Daegu" },
+    { code: "KWJ", name: "Gwangju" },
+    { code: "YNY", name: "Yangyang" }
+  ],
+  "SGP": [
+    { code: "SIN", name: "Singapore" }
+  ],
+  "THA": [
+    { code: "BKK", name: "Bangkok" },
+    { code: "CNX", name: "Chiang Mai" },
+    { code: "HKT", name: "Phuket" },
+    { code: "KBV", name: "Krabi" },
+    { code: "USM", name: "Koh Samui" },
+    { code: "UTP", name: "Pattaya" }
+  ],
+  "VNM": [
+    { code: "HAN", name: "Hanoi" },
+    { code: "SGN", name: "Ho Chi Minh City" },
+    { code: "DAD", name: "Da Nang" },
+    { code: "HPH", name: "Haiphong" },
+    { code: "NHA", name: "Nha Trang" },
+    { code: "CXR", name: "Cam Ranh" }
+  ],
+  "HKG": [
+    { code: "HKG", name: "Hong Kong" }
+  ],
+  "TWN": [
+    { code: "TPE", name: "Taipei" },
+    { code: "KHH", name: "Kaohsiung" },
+    { code: "RMQ", name: "Taichung" },
+    { code: "TNN", name: "Tainan" }
+  ],
+  "AUS": [
+    { code: "SYD", name: "Sydney" },
+    { code: "MEL", name: "Melbourne" },
+    { code: "BNE", name: "Brisbane" },
+    { code: "PER", name: "Perth" },
+    { code: "ADL", name: "Adelaide" },
+    { code: "CBR", name: "Canberra" },
+    { code: "CNS", name: "Cairns" },
+    { code: "OOL", name: "Gold Coast" }
+  ],
+  "USA": [
+    { code: "NYC", name: "New York" },
+    { code: "LAX", name: "Los Angeles" },
+    { code: "CHI", name: "Chicago" },
+    { code: "MIA", name: "Miami" },
+    { code: "SFO", name: "San Francisco" },
+    { code: "LAS", name: "Las Vegas" },
+    { code: "HNL", name: "Honolulu" },
+    { code: "SEA", name: "Seattle" },
+    { code: "BOS", name: "Boston" },
+    { code: "ATL", name: "Atlanta" }
+  ]
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -280,6 +370,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/preferences", (req, res) => {
     res.json(PREFERENCES);
+  });
+  
+  // Get cities for a specific country
+  app.get("/api/cities/:countryCode", (req, res) => {
+    const countryCode = req.params.countryCode;
+    
+    if (CITIES[countryCode]) {
+      res.json(CITIES[countryCode]);
+    } else {
+      // If there's no cities data for this country, return an empty array
+      res.json([]);
+    }
   });
 
   // Contact form

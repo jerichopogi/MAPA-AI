@@ -98,6 +98,7 @@ export const generateTripSchema = z.object({
   duration: z.number().int().min(1).max(30),
   budget: z.number().int().min(1),
   preferences: z.string().array().min(1, "Please select at least one preference"),
+  selectedCities: z.string().array().optional(),
 });
 
 // Contact form schema

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -6,13 +6,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ApiEndpoints } from "@/lib/constants";
 import { generateTripSchema } from "@shared/schema";
-import { GeneratedTripResponse, TripGenerateInput } from "@/lib/types";
+import { GeneratedTripResponse, TripGenerateInput, City } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 interface TripGeneratorFormProps {
@@ -43,6 +44,9 @@ interface Preference {
 const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   const [generatedTrip, setGeneratedTrip] = useState<GeneratedTripResponse | null>(null);
   const [selectedPreferences, setSelectedPreferences] = useState<string[]>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [availableCities, setAvailableCities] = useState<City[]>([]);
   const { toast } = useToast();
 
   // Fetch reference data
@@ -61,6 +65,33 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   const { data: preferences = [] } = useQuery<Preference[]>({
     queryKey: [ApiEndpoints.PREFERENCES],
   });
+  
+  // Fetch cities for selected country
+  const { data: cities = [], isLoading: isCitiesLoading } = useQuery<City[]>({
+    queryKey: [ApiEndpoints.CITIES, selectedCountry],
+    queryFn: async () => {
+      if (!selectedCountry) return [];
+      const response = await fetch(`${ApiEndpoints.CITIES}/${selectedCountry}`);
+      if (!response.ok) throw new Error("Failed to fetch cities");
+      return response.json();
+    },
+    enabled: !!selectedCountry,
+  });
+  
+  // Update available cities when data is loaded
+  useEffect(() => {
+    if (cities && cities.length > 0) {
+      setAvailableCities(cities);
+    } else {
+      setAvailableCities([]);
+    }
+  }, [cities]);
+  
+  // Reset selected cities when country changes
+  useEffect(() => {
+    setSelectedCities([]);
+    form.setValue('selectedCities', []);
+  }, [selectedCountry]);
 
   // Create form
   const form = useForm<TripGenerateInput>({
@@ -175,7 +206,10 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
                       <FormItem>
                         <FormLabel>Destination Country</FormLabel>
                         <Select 
-                          onValueChange={field.onChange} 
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setSelectedCountry(value);
+                          }}
                           defaultValue={field.value}
                         >
                           <FormControl>
@@ -335,6 +369,64 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
                     </FormItem>
                   )}
                 />
+                
+                {/* City selection - only shown when a country is selected */}
+                {selectedCountry && (
+                  <FormField
+                    control={form.control}
+                    name="selectedCities"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Cities to Visit in {countries.find(c => c.code === selectedCountry)?.name}</FormLabel>
+                        {isCitiesLoading ? (
+                          <div className="text-center py-4">
+                            <span className="animate-spin inline-block mr-2">
+                              <i className="fas fa-spinner"></i>
+                            </span>
+                            Loading cities...
+                          </div>
+                        ) : availableCities.length > 0 ? (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-1">
+                            {availableCities.map((city) => (
+                              <div key={city.code} className="relative">
+                                <div className="flex items-center space-x-2 border p-3 rounded-lg">
+                                  <Checkbox 
+                                    id={`city-${city.code}`}
+                                    checked={selectedCities.includes(city.code)}
+                                    onCheckedChange={(checked) => {
+                                      if (checked) {
+                                        const updatedCities = [...selectedCities, city.code];
+                                        setSelectedCities(updatedCities);
+                                        form.setValue("selectedCities", updatedCities);
+                                      } else {
+                                        const updatedCities = selectedCities.filter(c => c !== city.code);
+                                        setSelectedCities(updatedCities);
+                                        form.setValue("selectedCities", updatedCities);
+                                      }
+                                    }}
+                                  />
+                                  <label 
+                                    htmlFor={`city-${city.code}`}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                                  >
+                                    {city.name}
+                                  </label>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-center py-4 text-neutral-500">
+                            No cities available for this country.
+                          </div>
+                        )}
+                        <p className="text-sm text-neutral-500 mt-2">
+                          Select the cities you plan to visit during your trip.
+                        </p>
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="flex justify-center">
                   <Button 
