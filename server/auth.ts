@@ -26,13 +26,16 @@ export function setupAuth(app: Express) {
   app.use(
     session({
       secret: SESSION_SECRET,
-      resave: false,
+      resave: false, 
       saveUninitialized: false,
       store: new MemoryStoreSession({
         checkPeriod: 86400000 // prune expired entries every 24h
       }),
       cookie: {
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // true in production
+        sameSite: 'lax'
       }
     })
   );

@@ -60,6 +60,9 @@ function Router() {
       }
     },
     retry: false,
+    staleTime: 10 * 1000, // 10 seconds
+    refetchInterval: 30 * 1000, // 30 seconds
+    refetchOnWindowFocus: true,
   });
 
   // Protected route component
