@@ -66,8 +66,14 @@ function Router() {
   const ProtectedRoute = ({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) => {
     const [, setLocation] = useLocation();
     
+    // Add debug logging to better understand the values we're getting
+    console.log("[ProtectedRoute] User:", user);
+    console.log("[ProtectedRoute] isLoading:", isLoading);
+    console.log("[ProtectedRoute] Verification status:", user?.isVerified);
+    
     // Redirect to login page if not authenticated and not loading
     if (!isLoading && !user) {
+      console.log("[ProtectedRoute] Redirecting to login...");
       setLocation(Routes.LOGIN);
       return null;
     }
@@ -82,13 +88,14 @@ function Router() {
     }
 
     // Check if user is verified
-    if (user && !user.isVerified) {
-      // Redirect to verify email page
+    if (user && user.isVerified === false) {
+      console.log("[ProtectedRoute] User is not verified, redirecting to verification page");
       setLocation(Routes.VERIFY_EMAIL);
       return null;
     }
 
     // User is authenticated and verified, render the component
+    console.log("[ProtectedRoute] User is authenticated and verified, rendering component");
     return <Component {...rest} />;
   };
 

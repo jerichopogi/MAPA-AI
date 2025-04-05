@@ -47,24 +47,35 @@ export function setupAuth(app: Express) {
       { usernameField: "email" },
       async (email, password, done) => {
         try {
+          console.log("LocalStrategy: Attempting login for email:", email);
           const user = await storage.getUserByEmail(email);
+          
           if (!user) {
+            console.log("LocalStrategy: User not found");
             return done(null, false, { message: "Incorrect email or password" });
           }
           
+          console.log("LocalStrategy: User found:", user.username);
+          
           // Skip password check for OAuth users
           if (!user.password) {
+            console.log("LocalStrategy: OAuth user (no password) - rejecting");
             return done(null, false, { message: "Please log in with your social account" });
           }
           
           // Use bcrypt to verify password
+          console.log("LocalStrategy: Verifying password");
           const passwordMatch = await bcrypt.compare(password, user.password);
+          
           if (!passwordMatch) {
+            console.log("LocalStrategy: Password does not match");
             return done(null, false, { message: "Incorrect email or password" });
           }
           
+          console.log("LocalStrategy: Password matches, authentication successful");
           return done(null, user);
         } catch (err) {
+          console.error("LocalStrategy: Error during authentication:", err);
           return done(err);
         }
       }
@@ -259,17 +270,25 @@ function generateUsername(displayName: string, email?: string): string {
 function registerAuthRoutes(app: Express) {
   // Regular login route
   app.post("/api/login", (req, res, next) => {
+    console.log("Login request received:", req.body.email);
     passport.authenticate("local", (err: any, user: any, info: any) => {
+      console.log("Passport auth result:", { hasError: !!err, hasUser: !!user, info });
+      
       if (err) {
+        console.error("Login error:", err);
         return next(err);
       }
       if (!user) {
-        return res.status(401).json({ message: info.message || "Authentication failed" });
+        console.log("Authentication failed:", info?.message || "Unknown reason");
+        return res.status(401).json({ message: info?.message || "Authentication failed" });
       }
+      
       req.logIn(user, (err) => {
         if (err) {
+          console.error("Session login error:", err);
           return next(err);
         }
+        console.log("Login successful for user:", user.username, "Verified:", user.isVerified);
         const { password, providerData, ...safeUser } = user;
         return res.json({ message: "Login successful", user: safeUser });
       });
@@ -353,11 +372,18 @@ function registerAuthRoutes(app: Express) {
   app.get(
     "/api/auth/google/callback",
     passport.authenticate("google", { 
-      failureRedirect: "/auth",
+      failureRedirect: "/login",
     }),
     (req, res) => {
       // Successful authentication, redirect to dashboard
-      res.redirect("/dashboard");
+      const user = req.user as User;
+      if (user && !user.isVerified) {
+        // User is not verified, redirect to verification page
+        res.redirect("/verify-email");
+      } else {
+        // User is verified, redirect to dashboard
+        res.redirect("/dashboard");
+      }
     }
   );
 
@@ -367,11 +393,18 @@ function registerAuthRoutes(app: Express) {
   app.get(
     "/api/auth/facebook/callback",
     passport.authenticate("facebook", {
-      failureRedirect: "/auth",
+      failureRedirect: "/login",
     }),
     (req, res) => {
-      // Successful authentication, redirect to dashboard
-      res.redirect("/dashboard");
+      // Successful authentication, redirect based on verification status
+      const user = req.user as User;
+      if (user && !user.isVerified) {
+        // User is not verified, redirect to verification page
+        res.redirect("/verify-email");
+      } else {
+        // User is verified, redirect to dashboard
+        res.redirect("/dashboard");
+      }
     }
   );
 }

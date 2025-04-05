@@ -39,11 +39,17 @@ const Login = () => {
 
   const onSubmit = async (data: LoginInput) => {
     setIsLoading(true);
+    console.log("Login attempt with:", data.email);
     try {
-      await loginMutation.mutateAsync(data);
+      // Add a debugging message
+      console.log("Submitting login request...");
+      const user = await loginMutation.mutateAsync(data);
+      console.log("Login response:", user);
+      console.log("Redirecting to dashboard...");
       setLocation(Routes.DASHBOARD);
     } catch (error) {
       // Error is already handled by the loginMutation onError
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
