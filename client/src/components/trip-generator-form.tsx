@@ -156,7 +156,12 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   });
 
   const onSubmit = (data: TripGenerateInput) => {
-    generateTripMutation.mutate(data);
+    // Make sure selectedCities is included in the data
+    const tripData = {
+      ...data,
+      selectedCities: selectedCities
+    };
+    generateTripMutation.mutate(tripData);
   };
 
   return (

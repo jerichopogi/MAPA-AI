@@ -224,11 +224,22 @@ export class MemStorage implements IStorage {
   async createTrip(insertTrip: InsertTrip): Promise<Trip> {
     const id = this.tripIdCounter++;
     const now = new Date();
+    
+    // Create a properly typed Trip object
     const trip: Trip = { 
-      ...insertTrip, 
-      id, 
-      createdAt: now,
+      id,
+      userId: insertTrip.userId,
+      name: insertTrip.name,
+      originAirport: insertTrip.originAirport,
+      destinationCountry: insertTrip.destinationCountry,
+      travelMonth: insertTrip.travelMonth,
+      currency: insertTrip.currency,
+      duration: insertTrip.duration,
+      budget: insertTrip.budget,
+      preferences: insertTrip.preferences,
+      selectedCities: insertTrip.selectedCities ?? [],
       status: insertTrip.status || "upcoming",
+      createdAt: now,
       startDate: insertTrip.startDate || null,
       endDate: insertTrip.endDate || null,
       budgetItinerary: insertTrip.budgetItinerary || null,
