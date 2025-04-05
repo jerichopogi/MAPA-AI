@@ -153,9 +153,11 @@ const Login = () => {
                     <FormItem>
                       <div className="flex items-center justify-between mb-1">
                         <FormLabel>Password</FormLabel>
-                        <a href="#forgot-password" className="text-sm font-medium text-primary hover:text-primary-dark">
-                          Forgot password?
-                        </a>
+                        <Link href={Routes.FORGOT_PASSWORD}>
+                          <a className="text-sm font-medium text-primary hover:text-primary-dark">
+                            Forgot password?
+                          </a>
+                        </Link>
                       </div>
                       <FormControl>
                         <Input 
