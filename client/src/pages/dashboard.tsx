@@ -57,9 +57,25 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="ml-4 flex items-center md:ml-6">
-              <button type="button" className="p-1 rounded-full text-neutral-500 hover:text-neutral-600">
+              <button type="button" className="p-1 rounded-full text-neutral-500 hover:text-neutral-600 mr-3">
                 <span className="sr-only">View notifications</span>
                 <i className="fas fa-bell"></i>
+              </button>
+              {/* Logout Button */}
+              <button 
+                type="button" 
+                className="flex items-center text-sm px-3 py-1.5 rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100"
+                onClick={async () => {
+                  try {
+                    await fetch('/api/logout', { method: 'POST' });
+                    window.location.href = Routes.HOME;
+                  } catch (error) {
+                    console.error('Logout failed:', error);
+                  }
+                }}
+              >
+                <i className="fas fa-sign-out-alt mr-2"></i>
+                Logout
               </button>
             </div>
           </div>
