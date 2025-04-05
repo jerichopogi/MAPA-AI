@@ -142,19 +142,40 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   const generateTripMutation = useMutation({
     mutationFn: async (data: TripGenerateInput) => {
       const response = await apiRequest("POST", ApiEndpoints.GENERATE_TRIP, data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to generate trip");
+      }
       return response.json() as Promise<GeneratedTripResponse>;
     },
     onSuccess: (data) => {
+      console.log("Trip generation successful, data received:", data);
+      
+      // Check if the data has the expected structure
+      if (!data || !data.tripName || !data.budgetItinerary || !data.experienceItinerary) {
+        console.error("Invalid trip data received:", data);
+        toast({
+          title: "Error",
+          description: "Received incomplete trip data. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       setGeneratedTrip(data);
       if (onTripGenerated) {
         onTripGenerated(data);
       }
+      
       toast({
         title: "Trip Generated!",
         description: "Your personalized itineraries are ready to explore.",
       });
     },
     onError: (error) => {
+      console.error("Trip generation error:", error);
+      setGeneratedTrip(null); // Reset to form view
+      
       toast({
         title: "Failed to generate trip",
         description: error instanceof Error ? error.message : "An unexpected error occurred",

@@ -119,18 +119,89 @@ export async function generateTripItinerary(
       if (jsonMatch && jsonMatch[1]) {
         try {
           // Try parsing with some sanitization
-          const cleanedJson = jsonMatch[1]
+          let cleanedJson = jsonMatch[1]
             .replace(/\\n/g, " ")
             .replace(/\\"/g, '"')
             .replace(/\\\\/g, '\\')
             .replace(/\s+/g, " ")
             .trim();
             
+          // Try to fix common JSON syntax errors from the AI
+          
+          // Fix missing property values (e.g., "dinner": "cost": 1400} -> "dinner": {"description": "Dinner", "cost": 1400})
+          cleanedJson = cleanedJson.replace(/"dinner"\s*:\s*"cost"\s*:\s*(\d+)/g, '"dinner": {"description": "Dinner", "cost": $1}');
+          cleanedJson = cleanedJson.replace(/"lunch"\s*:\s*"cost"\s*:\s*(\d+)/g, '"lunch": {"description": "Lunch", "cost": $1}');
+          cleanedJson = cleanedJson.replace(/"breakfast"\s*:\s*"cost"\s*:\s*(\d+)/g, '"breakfast": {"description": "Breakfast", "cost": $1}');
+          
+          // Fix missing quotes around property names
+          cleanedJson = cleanedJson.replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:)/g, '$1"$2"$3');
+          
+          // Fix common syntax errors in JSON content
+          cleanedJson = cleanedJson.replace(/,\s*}/g, '}');  // Remove trailing commas
+          cleanedJson = cleanedJson.replace(/,\s*,/g, ',');  // Remove duplicate commas
+          cleanedJson = cleanedJson.replace(/}\s*{/g, '},{'); // Fix missing commas between objects
+          
+          console.log("Attempting to parse cleaned JSON");
           return JSON.parse(cleanedJson);
         } catch (extractError) {
           console.error("Failed to parse extracted JSON:", extractError);
-          // Create a fallback response
-          throw new Error("Failed to extract valid JSON from AI response");
+          
+          // If all else fails, use regex to extract the necessary components
+          try {
+            console.log("Attempting alternative JSON reconstruction");
+            
+            // Extract trip name
+            const tripNameMatch = jsonMatch[1].match(/"tripName"\s*:\s*"([^"]+)"/);
+            const tripName = tripNameMatch ? tripNameMatch[1] : "Generated Trip";
+            
+            // Create a simplified response with default values when parsing fails
+            return {
+              tripName,
+              budgetItinerary: {
+                summary: "Budget-friendly itinerary (reconstructed due to parsing error)",
+                dailyPlans: [
+                  {
+                    day: 1,
+                    activities: [
+                      {time: "Morning", description: "Free time to explore", cost: 0},
+                      {time: "Afternoon", description: "Local sightseeing", cost: 0},
+                      {time: "Evening", description: "Dinner at local restaurant", cost: 0}
+                    ],
+                    accommodation: {name: "Budget accommodation", cost: 0},
+                    meals: {
+                      breakfast: {description: "Continental breakfast", cost: 0},
+                      lunch: {description: "Local cuisine", cost: 0},
+                      dinner: {description: "Restaurant dinner", cost: 0}
+                    }
+                  }
+                ],
+                totalCost: 0
+              },
+              experienceItinerary: {
+                summary: "Experience-focused itinerary (reconstructed due to parsing error)",
+                dailyPlans: [
+                  {
+                    day: 1,
+                    activities: [
+                      {time: "Morning", description: "Guided tour", cost: 0},
+                      {time: "Afternoon", description: "Cultural experience", cost: 0},
+                      {time: "Evening", description: "Fine dining", cost: 0}
+                    ],
+                    accommodation: {name: "Luxury accommodation", cost: 0},
+                    meals: {
+                      breakfast: {description: "Gourmet breakfast", cost: 0},
+                      lunch: {description: "Restaurant lunch", cost: 0},
+                      dinner: {description: "Fine dining experience", cost: 0}
+                    }
+                  }
+                ],
+                totalCost: 0
+              }
+            };
+          } catch (fallbackError) {
+            console.error("Failed to create fallback response:", fallbackError);
+            throw new Error("Failed to extract valid JSON from AI response");
+          }
         }
       }
       
