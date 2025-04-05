@@ -35,7 +35,7 @@ const Header = () => {
             <h1 className="text-2xl font-bold font-sans text-primary flex items-center cursor-pointer">
               <i className="fas fa-map-marked-alt mr-2"></i>
               {APP_NAME.split("AI")[0]}
-              <span className="text-secondary">AI</span>
+              <span className="text-yellow-500">AI</span>
             </h1>
           </Link>
         </div>

@@ -22,13 +22,13 @@ const LandingPage = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary to-primary-dark text-white">
-        <div className="absolute inset-0 bg-black opacity-30"></div>
+      <section className="relative bg-primary text-white">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="container mx-auto px-4 py-20 md:py-28 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold font-sans leading-tight mb-6">
-                Your Journey, <br />Planned by <span className="text-secondary">AI</span>
+                Your Journey, <br />Planned by <span className="text-yellow-500">AI</span>
               </h1>
               <p className="text-lg md:text-xl mb-8 max-w-lg">
                 AI-powered travel companion designed for Filipino travelers. 
@@ -82,10 +82,10 @@ const LandingPage = () => {
 
           <div className="mt-12 text-center">
             <Link href={user ? Routes.DASHBOARD : Routes.LOGIN}>
-              <a className="inline-flex items-center text-primary font-medium hover:text-primary-dark">
+              <Button variant="link" className="text-primary font-medium hover:text-primary-dark p-0">
                 Explore all features
                 <i className="fas fa-arrow-right ml-2"></i>
-              </a>
+              </Button>
             </Link>
           </div>
         </div>
@@ -121,7 +121,7 @@ const LandingPage = () => {
       </section>
 
       {/* AI Powered Section */}
-      <section className="py-16 bg-gradient-to-r from-primary/5 to-primary/10">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-8 md:mb-0 md:pr-12">
@@ -178,7 +178,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold font-sans mb-6">Ready to Plan Your Next Adventure?</h2>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
-            Join thousands of Filipino travelers using MAPA<span className="text-secondary">AI</span> to create unforgettable journeys.
+            Join thousands of Filipino travelers using MAPA<span className="text-yellow-500">AI</span> to create unforgettable journeys.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link href={Routes.REGISTER}>

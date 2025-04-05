@@ -13,14 +13,16 @@ const DestinationCard = ({ destination }: DestinationCardProps) => {
           alt={destination.name} 
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/40 text-white">
           <h3 className="text-xl font-semibold">{destination.name}</h3>
         </div>
       </div>
       <div className="p-5">
         <div className="flex items-center mb-3">
           <span 
-            className={`bg-${destination.visaType || 'primary'}/10 text-${destination.visaType || 'primary'} text-xs font-medium px-2.5 py-0.5 rounded-full`}
+            className={destination.visaType === 'success' 
+              ? "bg-green-100 text-green-700 text-xs font-medium px-2.5 py-0.5 rounded-full" 
+              : "bg-primary/10 text-primary text-xs font-medium px-2.5 py-0.5 rounded-full"}
           >
             {destination.visaStatus}
           </span>
