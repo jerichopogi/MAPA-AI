@@ -99,15 +99,37 @@ export async function generateTripItinerary(
       // If direct parsing fails, try to extract JSON content
       console.error("Failed to parse direct JSON, attempting to extract JSON block:", parseError);
       
+      // Log the full response for debugging
+      console.log("Full AI response:", responseText);
+      
       // Search for JSON content between triple backticks
-      const jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) || 
-                         responseText.match(/```\n([\s\S]*?)```/);
-                         
+      let jsonMatch = responseText.match(/```json\n([\s\S]*?)```/) || 
+                      responseText.match(/```\n([\s\S]*?)```/);
+      
+      // If no match with backticks, try to find JSON by pattern matching
+      if (!jsonMatch) {
+        const jsonPattern = /\{\s*"tripName"[\s\S]*"budgetItinerary"[\s\S]*"experienceItinerary"[\s\S]*\}/;
+        const jsonMatchRaw = responseText.match(jsonPattern);
+        if (jsonMatchRaw) {
+          jsonMatch = ["", jsonMatchRaw[0]];
+        }
+      }
+      
+      // Try to extract and clean the JSON content
       if (jsonMatch && jsonMatch[1]) {
         try {
-          return JSON.parse(jsonMatch[1]);
+          // Try parsing with some sanitization
+          const cleanedJson = jsonMatch[1]
+            .replace(/\\n/g, " ")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\')
+            .replace(/\s+/g, " ")
+            .trim();
+            
+          return JSON.parse(cleanedJson);
         } catch (extractError) {
           console.error("Failed to parse extracted JSON:", extractError);
+          // Create a fallback response
           throw new Error("Failed to extract valid JSON from AI response");
         }
       }
@@ -166,37 +188,55 @@ For EACH itinerary, include:
   * Meal suggestions (breakfast, lunch, dinner) with estimated costs
 - A total estimated cost for the entire trip
 
-FORMAT:
-Return ONLY a valid JSON object exactly matching this structure:
+FORMAT INSTRUCTIONS:
+I need your response to be EXACTLY a valid JSON object with no other text or explanations.
+The JSON must match this schema precisely:
+
 {
-  "tripName": "Trip to [Destination]",
+  "tripName": string,
   "budgetItinerary": {
-    "summary": "Short description of budget approach",
+    "summary": string,
     "dailyPlans": [
       {
-        "day": 1,
+        "day": number,
         "activities": [
-          {"time": "Morning", "description": "Activity description", "cost": 1000},
-          {"time": "Afternoon", "description": "Activity description", "cost": 1000},
-          {"time": "Evening", "description": "Activity description", "cost": 1000}
+          {"time": string, "description": string, "cost": number},
+          {"time": string, "description": string, "cost": number},
+          {"time": string, "description": string, "cost": number}
         ],
-        "accommodation": {"name": "Accommodation name", "cost": 2000},
+        "accommodation": {"name": string, "cost": number},
         "meals": {
-          "breakfast": {"description": "Meal description", "cost": 500},
-          "lunch": {"description": "Meal description", "cost": 800},
-          "dinner": {"description": "Meal description", "cost": 1000}
+          "breakfast": {"description": string, "cost": number},
+          "lunch": {"description": string, "cost": number},
+          "dinner": {"description": string, "cost": number}
         }
       }
-      // Additional days...
     ],
-    "totalCost": 50000
+    "totalCost": number
   },
   "experienceItinerary": {
-    // Same structure as budgetItinerary
+    "summary": string,
+    "dailyPlans": [
+      {
+        "day": number,
+        "activities": [
+          {"time": string, "description": string, "cost": number},
+          {"time": string, "description": string, "cost": number},
+          {"time": string, "description": string, "cost": number}
+        ],
+        "accommodation": {"name": string, "cost": number},
+        "meals": {
+          "breakfast": {"description": string, "cost": number},
+          "lunch": {"description": string, "cost": number},
+          "dinner": {"description": string, "cost": number}
+        }
+      }
+    ],
+    "totalCost": number
   }
 }
 
-Do NOT include any explanations, introductions, or additional text outside the JSON.
-Return ONLY the JSON object exactly as specified.
+CRITICAL: Your ENTIRE response should be ONLY a valid JSON object with no comments, explanations, or text outside the JSON structure.
+Do NOT include backticks, markdown formatting, or any other text.
 `;
 }

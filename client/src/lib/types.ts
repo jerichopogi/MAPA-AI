@@ -25,9 +25,12 @@ export interface Currency {
 }
 
 export interface Preference {
-  id: string;
+  id: number;
+  code: string;
   name: string;
   icon: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export interface DestinationCard {
