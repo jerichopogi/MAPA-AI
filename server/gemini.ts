@@ -133,8 +133,22 @@ export async function generateTripItinerary(
           cleanedJson = cleanedJson.replace(/"lunch"\s*:\s*"cost"\s*:\s*(\d+)/g, '"lunch": {"description": "Lunch", "cost": $1}');
           cleanedJson = cleanedJson.replace(/"breakfast"\s*:\s*"cost"\s*:\s*(\d+)/g, '"breakfast": {"description": "Breakfast", "cost": $1}');
           
+          // Fix specific pattern we're seeing in the errors: "Evening": "description": -> "Evening": {"description":
+          cleanedJson = cleanedJson.replace(/"(Morning|Afternoon|Evening)"\s*:\s*"description"\s*:/g, '"$1": {"description":');
+          
+          // Fix unquoted properties in objects (especially seen in "meals" objects)
+          cleanedJson = cleanedJson.replace(/({|,)\s*(breakfast|lunch|dinner|day|time|description|cost|name|activities|accommodation|meals|summary|dailyPlans|totalCost)\s*:/g, '$1"$2":');
+          
           // Fix missing quotes around property names
           cleanedJson = cleanedJson.replace(/([{,]\s*)([a-zA-Z0-9_]+)(\s*:)/g, '$1"$2"$3');
+          
+          // Fix common issue with "Evening": "description" format where the colon is missing between keywords
+          cleanedJson = cleanedJson.replace(/"Evening"\s*:\s*"description"\s*"([^"]+)"\s*,\s*"cost"/g, '"Evening": {"description": "$1", "cost"');
+          
+          // Fix specific syntax error with "Evening:" syntax
+          cleanedJson = cleanedJson.replace(/"(Morning|Afternoon|Evening)"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:/g, '"$1": {"description": "$2", "cost":');
+          cleanedJson = cleanedJson.replace(/"day"\s*:\s*(\d+)\s*,\s*"activities"\s*:\s*\[\s*{\s*"time"\s*:\s*"Morning"\s*,\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)\s*}\s*,\s*{\s*"time"\s*:\s*"Afternoon"\s*,\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)\s*}\s*,\s*{\s*"time"\s*:\s*"Evening"\s*:\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)/g, 
+          '"day": $1, "activities": [{"time": "Morning", "description": "$2", "cost": $3}, {"time": "Afternoon", "description": "$4", "cost": $5}, {"time": "Evening", "description": "$6", "cost": $7');
           
           // Fix common syntax errors in JSON content
           cleanedJson = cleanedJson.replace(/,\s*}/g, '}');  // Remove trailing commas
@@ -260,54 +274,60 @@ For EACH itinerary, include:
 - A total estimated cost for the entire trip
 
 FORMAT INSTRUCTIONS:
-I need your response to be EXACTLY a valid JSON object with no other text or explanations.
-The JSON must match this schema precisely:
+You must respond with ONLY valid JSON - no other text, no code blocks, no comments!
+
+Every key in the JSON must be quoted with double quotes!
+Every string value must be quoted with double quotes!
+Every object must have proper opening and closing braces!
+All property values must follow the specified JSON schema!
+
+The JSON structure must match the following schema:
 
 {
-  "tripName": string,
+  "tripName": "string value with title of the trip",
   "budgetItinerary": {
-    "summary": string,
+    "summary": "string summary of budget approach",
     "dailyPlans": [
       {
-        "day": number,
+        "day": 1,
         "activities": [
-          {"time": string, "description": string, "cost": number},
-          {"time": string, "description": string, "cost": number},
-          {"time": string, "description": string, "cost": number}
+          {"time": "Morning", "description": "activity description", "cost": 50},
+          {"time": "Afternoon", "description": "activity description", "cost": 50},
+          {"time": "Evening", "description": "activity description", "cost": 50}
         ],
-        "accommodation": {"name": string, "cost": number},
+        "accommodation": {"name": "hotel name", "cost": 100},
         "meals": {
-          "breakfast": {"description": string, "cost": number},
-          "lunch": {"description": string, "cost": number},
-          "dinner": {"description": string, "cost": number}
+          "breakfast": {"description": "meal description", "cost": 10},
+          "lunch": {"description": "meal description", "cost": 15},
+          "dinner": {"description": "meal description", "cost": 20}
         }
       }
     ],
-    "totalCost": number
+    "totalCost": 1000
   },
   "experienceItinerary": {
-    "summary": string,
+    "summary": "string summary of experience approach",
     "dailyPlans": [
       {
-        "day": number,
+        "day": 1,
         "activities": [
-          {"time": string, "description": string, "cost": number},
-          {"time": string, "description": string, "cost": number},
-          {"time": string, "description": string, "cost": number}
+          {"time": "Morning", "description": "activity description", "cost": 100},
+          {"time": "Afternoon", "description": "activity description", "cost": 100},
+          {"time": "Evening", "description": "activity description", "cost": 100}
         ],
-        "accommodation": {"name": string, "cost": number},
+        "accommodation": {"name": "hotel name", "cost": 200},
         "meals": {
-          "breakfast": {"description": string, "cost": number},
-          "lunch": {"description": string, "cost": number},
-          "dinner": {"description": string, "cost": number}
+          "breakfast": {"description": "meal description", "cost": 20},
+          "lunch": {"description": "meal description", "cost": 30},
+          "dinner": {"description": "meal description", "cost": 50}
         }
       }
     ],
-    "totalCost": number
+    "totalCost": 2000
   }
 }
 
 CRITICAL: Your ENTIRE response should be ONLY a valid JSON object with no comments, explanations, or text outside the JSON structure.
-Do NOT include backticks, markdown formatting, or any other text.
+Do NOT include backticks, markdown formatting, or any other text. Your response should begin with { and end with } with no other characters before or after.
 `;
 }

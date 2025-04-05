@@ -176,11 +176,30 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
       console.error("Trip generation error:", error);
       setGeneratedTrip(null); // Reset to form view
       
-      toast({
-        title: "Failed to generate trip",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
-      });
+      // Check if error is related to the AI model or API key
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+      const isApiKeyError = errorMessage.includes("API key") || errorMessage.includes("authentication");
+      const isAiModelError = errorMessage.includes("AI") || errorMessage.includes("model");
+      
+      if (isApiKeyError) {
+        toast({
+          title: "API Key Error",
+          description: "There was an issue with the AI service authentication. Please try again later.",
+          variant: "destructive",
+        });
+      } else if (isAiModelError) {
+        toast({
+          title: "AI Response Error",
+          description: "The AI had trouble generating a proper trip itinerary. Please try again with different preferences.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Failed to generate trip",
+          description: "Our trip generation service is experiencing issues. Please try again in a few minutes.",
+          variant: "destructive",
+        });
+      }
     }
   });
 
@@ -589,11 +608,37 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
               Generate Another Trip
             </Button>
             <Button onClick={() => {
-              // In a real app, this would save the trip to the user's account
-              toast({
-                title: "Trip saved!",
-                description: "Your trip has been saved to My Trips.",
-              });
+              if (!user) {
+                toast({
+                  title: "Login Required",
+                  description: "Please log in to save your trip.",
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              try {
+                // In a real app, this would save the trip to the user's account
+                if (generatedTrip && 
+                    generatedTrip.tripName && 
+                    generatedTrip.budgetItinerary && 
+                    generatedTrip.experienceItinerary) {
+                  // Additional data validation to ensure we have a valid trip
+                  toast({
+                    title: "Trip saved!",
+                    description: "Your trip has been saved to My Trips.",
+                  });
+                } else {
+                  throw new Error("Invalid trip data");
+                }
+              } catch (error) {
+                console.error("Error saving trip:", error);
+                toast({
+                  title: "Save failed",
+                  description: "Unable to save this trip. Please try again.",
+                  variant: "destructive",
+                });
+              }
             }}>
               <i className="fas fa-save mr-2"></i> Save This Trip
             </Button>
