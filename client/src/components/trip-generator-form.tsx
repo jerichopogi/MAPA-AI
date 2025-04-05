@@ -7,6 +7,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ApiEndpoints } from "@/lib/constants";
 import { generateTripSchema } from "@shared/schema";
 import { GeneratedTripResponse, TripGenerateInput, City } from "@/lib/types";
+import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -51,6 +52,7 @@ const TripGeneratorForm = ({ onTripGenerated }: TripGeneratorFormProps) => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   const [availableCities, setAvailableCities] = useState<City[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   // Fetch reference data
   const { data: airports = [] } = useQuery<Airport[]>({

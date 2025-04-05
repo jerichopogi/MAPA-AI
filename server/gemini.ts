@@ -150,6 +150,9 @@ export async function generateTripItinerary(
           cleanedJson = cleanedJson.replace(/"day"\s*:\s*(\d+)\s*,\s*"activities"\s*:\s*\[\s*{\s*"time"\s*:\s*"Morning"\s*,\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)\s*}\s*,\s*{\s*"time"\s*:\s*"Afternoon"\s*,\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)\s*}\s*,\s*{\s*"time"\s*:\s*"Evening"\s*:\s*"description"\s*:\s*"([^"]+)"\s*,\s*"cost"\s*:\s*(\d+)/g, 
           '"day": $1, "activities": [{"time": "Morning", "description": "$2", "cost": $3}, {"time": "Afternoon", "description": "$4", "cost": $5}, {"time": "Evening", "description": "$6", "cost": $7');
           
+          // Fix the exact pattern we're seeing in the error: "Evening": "description": "..." -> "Evening": {"description": "..."
+          cleanedJson = cleanedJson.replace(/"Evening"\s*:\s*"description"\s*:\s*"([^"]+)"/g, '"Evening": {"description": "$1"');
+          
           // Fix common syntax errors in JSON content
           cleanedJson = cleanedJson.replace(/,\s*}/g, '}');  // Remove trailing commas
           cleanedJson = cleanedJson.replace(/,\s*,/g, ',');  // Remove duplicate commas
