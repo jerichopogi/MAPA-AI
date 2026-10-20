@@ -2,6 +2,7 @@ import { ArrowUpRight, BedDouble, Plane, Ticket } from "lucide-react";
 import type { BookingSuggestions as Suggestions } from "@shared/schema";
 import { PARTNERS, flightPartners, partnerLink, type Partner } from "@/lib/affiliates";
 import { cn, formatCurrency } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 function PartnerButton({ partner, vars, primary }: { partner: Partner; vars: Parameters<typeof partnerLink>[1]; primary?: boolean }) {
   return (
@@ -20,10 +21,11 @@ function PartnerButton({ partner, vars, primary }: { partner: Partner; vars: Par
 }
 
 function Section({ icon: Icon, title, children }: { icon: typeof Plane; title: string; children: React.ReactNode }) {
+  const { t } = useI18n();
   return (
     <div>
       <h3 className="mb-3 flex items-center gap-2 text-sm font-medium">
-        <Icon className="h-4 w-4 text-primary" /> {title}
+        <Icon className="h-4 w-4 text-primary" /> {t(title)}
       </h3>
       <div className="grid gap-3 sm:grid-cols-2">{children}</div>
     </div>
@@ -138,12 +140,13 @@ export function BookThisTrip({
   where: string;
   className?: string;
 }) {
+  const { t } = useI18n();
   const hasSuggestions = bookings && (bookings.flights.length || bookings.stays.length || bookings.activities.length);
   return (
     <section id="book" className={cn("scroll-mt-8 no-print", className)}>
-      <h2 className="text-lg font-medium">Book this trip</h2>
+      <h2 className="text-lg font-medium">{t("Book this trip")}</h2>
       <p className="mb-5 mt-1 text-sm text-muted-foreground">
-        {hasSuggestions ? "Hand-picked by the AI for this itinerary." : `Find flights, stays and tours for ${where}.`}
+        {hasSuggestions ? t("Hand-picked by the AI for this itinerary.") : `Find flights, stays and tours for ${where}.`}
       </p>
       {hasSuggestions ? (
         <BookingSuggestions bookings={bookings} currency={currency} />

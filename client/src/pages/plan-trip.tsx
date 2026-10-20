@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useBillingStatus } from "@/hooks/use-billing";
 import { useCreateTrip } from "@/hooks/use-trips";
 import { aiApi, isQuotaError } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { Routes, tripPath } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +62,7 @@ function toggle(list: string[], value: string) {
 export default function PlanTrip() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useI18n();
   const [result, setResult] = useState<{ input: GenerateTripInput; response: AiResult<GeneratedTrip> } | null>(null);
   const createTrip = useCreateTrip();
   const { data: billing } = useBillingStatus();
@@ -123,23 +125,23 @@ export default function PlanTrip() {
     return (
       <>
         <Button variant="ghost" size="sm" className="-ml-3 mb-4" onClick={() => setResult(null)}>
-          <ArrowLeft /> Edit details
+          <ArrowLeft /> {t("Edit details")}
         </Button>
         <PageHeader
           title={response.data.tripName}
-          description="Two plans for the same trip — compare them and save the one you like."
+          description={t("Two plans for the same trip — compare them and save the one you like.")}
           actions={
             <>
               <Button variant="outline" asChild>
                 <a href="#book">
-                  <ArrowDown /> Book this trip
+                  <ArrowDown /> {t("Book this trip")}
                 </a>
               </Button>
               <Button variant="outline" onClick={() => generate.mutate(input)} disabled={generate.isPending}>
-                {generate.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} Regenerate
+                {generate.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} {t("Regenerate")}
               </Button>
               <Button onClick={save} disabled={createTrip.isPending}>
-                {createTrip.isPending ? <Loader2 className="animate-spin" /> : <Save />} Save trip
+                {createTrip.isPending ? <Loader2 className="animate-spin" /> : <Save />} {t("Save trip")}
               </Button>
             </>
           }
@@ -165,7 +167,7 @@ export default function PlanTrip() {
 
   return (
     <>
-      <PageHeader title="Plan a trip" description="Tell us the basics. We'll draft a budget plan and an experience plan." />
+      <PageHeader title={t("Plan a trip")} description={t("Tell us the basics. We'll draft a budget plan and an experience plan.")} />
 
       <Form {...form}>
         <form noValidate onSubmit={form.handleSubmit((values) => generate.mutate(values))} className="space-y-10">
@@ -175,7 +177,7 @@ export default function PlanTrip() {
               name="destinationCountry"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Where to?</FormLabel>
+                  <FormLabel>{t("Where to?")}</FormLabel>
                   <Select
                     value={field.value}
                     onValueChange={(v) => {
@@ -185,7 +187,7 @@ export default function PlanTrip() {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose a country" />
+                        <SelectValue placeholder={t("Choose a country")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -205,7 +207,7 @@ export default function PlanTrip() {
               name="originAirport"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Flying from</FormLabel>
+                  <FormLabel>{t("Flying from")}</FormLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
@@ -229,7 +231,7 @@ export default function PlanTrip() {
               name="travelMonth"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>When</FormLabel>
+                  <FormLabel>{t("When")}</FormLabel>
                   <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
                     <FormControl>
                       <SelectTrigger>
@@ -253,7 +255,7 @@ export default function PlanTrip() {
               name="duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>How many days</FormLabel>
+                  <FormLabel>{t("How many days")}</FormLabel>
                   <FormControl>
                     <Input type="number" min={1} max={30} {...field} onChange={(e) => field.onChange(e.target.valueAsNumber || 0)} />
                   </FormControl>
@@ -267,7 +269,7 @@ export default function PlanTrip() {
                 name="currency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Currency</FormLabel>
+                    <FormLabel>{t("Currency")}</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -290,7 +292,7 @@ export default function PlanTrip() {
                 name="budget"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Total budget</FormLabel>
+                    <FormLabel>{t("Total budget")}</FormLabel>
                     <FormControl>
                       <Input type="number" min={1} {...field} onChange={(e) => field.onChange(e.target.valueAsNumber || 0)} />
                     </FormControl>
@@ -307,8 +309,8 @@ export default function PlanTrip() {
               name="selectedCities"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cities to include</FormLabel>
-                  <p className="text-sm text-muted-foreground">Optional — leave empty and we'll pick the highlights.</p>
+                  <FormLabel>{t("Cities to include")}</FormLabel>
+                  <p className="text-sm text-muted-foreground">{t("Optional — leave empty and we'll pick the highlights.")}</p>
                   <div className="flex flex-wrap gap-2 pt-1">
                     {cities.map((c) => (
                       <Chip key={c.code} selected={field.value?.includes(c.code) ?? false} onClick={() => field.onChange(toggle(field.value ?? [], c.code))}>
@@ -326,7 +328,7 @@ export default function PlanTrip() {
             name="preferences"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>What do you enjoy?</FormLabel>
+                <FormLabel>{t("What do you enjoy?")}</FormLabel>
                 <div className="flex flex-wrap gap-2 pt-1">
                   {PREFERENCES.map((p) => (
                     <Chip key={p.code} selected={field.value.includes(p.code)} onClick={() => field.onChange(toggle(field.value, p.code))}>
@@ -350,11 +352,11 @@ export default function PlanTrip() {
             <Button type="submit" size="lg" disabled={generate.isPending} className="w-full sm:w-auto">
               {generate.isPending ? (
                 <>
-                  <Loader2 className="animate-spin" /> Planning your trip…
+                  <Loader2 className="animate-spin" /> {t("Planning your trip…")}
                 </>
               ) : (
                 <>
-                  <Sparkles /> Generate itineraries
+                  <Sparkles /> {t("Generate itineraries")}
                 </>
               )}
             </Button>

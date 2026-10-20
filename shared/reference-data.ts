@@ -169,3 +169,30 @@ export const preferenceName = (code: string) => preferenceNames.get(code) ?? cod
 export const cityName = (country: string, code: string) =>
   CITIES_BY_COUNTRY[country]?.find((c) => c.code === code)?.name ?? code;
 export const monthName = (month: number) => MONTHS[month - 1] ?? "";
+
+/** Visa basics for Philippine passports, used in reminder emails (always "check the embassy"). */
+export const VISA_BASICS: Record<string, { required: boolean; note: string }> = {
+  JPN: { required: true, note: "Apply through a DFA-accredited agency; processing is about 5–7 working days." },
+  KOR: { required: true, note: "Apply through the Korea Visa Application Center; allow 1–2 weeks." },
+  TWN: { required: true, note: "Check visa-free eligibility first; otherwise apply for an eVisa or visitor visa." },
+  USA: { required: true, note: "B-1/B-2 visa with an embassy interview — appointments can take months." },
+  CAN: { required: true, note: "Visitor visa applied online; biometrics required, allow several weeks." },
+  AUS: { required: true, note: "Visitor visa (subclass 600) applied online; allow 3–6 weeks." },
+  GBR: { required: true, note: "Standard Visitor visa with biometrics; allow about 3 weeks." },
+  FRA: { required: true, note: "Schengen visa (with travel insurance); book the appointment early." },
+  ITA: { required: true, note: "Schengen visa (with travel insurance); book the appointment early." },
+  ESP: { required: true, note: "Schengen visa (with travel insurance); book the appointment early." },
+  SGP: { required: false, note: "Visa-free up to 30 days. Submit the SG Arrival Card within 3 days before arrival." },
+  THA: { required: false, note: "Visa-free for tourism. Keep your return ticket and hotel booking handy." },
+  VNM: { required: false, note: "Visa-free up to 21 days." },
+  MYS: { required: false, note: "Visa-free up to 30 days. Fill in the MDAC arrival card before you fly." },
+  IDN: { required: false, note: "Visa-free for ASEAN citizens. Keep your return ticket handy." },
+  HKG: { required: false, note: "Visa-free up to 14 days." },
+};
+
+/** Power plug types travelers need adapters for (the Philippines uses A/B/C). */
+export const PLUG_TYPES: Record<string, string> = {
+  JPN: "A/B (same as PH — usually no adapter)", KOR: "C/F", SGP: "G", THA: "A/B/C/O", VNM: "A/C",
+  MYS: "G", IDN: "C/F", HKG: "G", TWN: "A/B (same as PH)", AUS: "I", USA: "A/B (same as PH)",
+  CAN: "A/B (same as PH)", GBR: "G", FRA: "C/E", ITA: "C/F/L", ESP: "C/F",
+};

@@ -55,6 +55,9 @@ export type ChatInput = z.infer<typeof chatSchema>;
 // AI response shapes
 // ---------------------------------------------------------------------------
 
+/** Interface/AI language: English or Taglish. */
+export type Lang = "en" | "tl";
+
 /** Where an AI answer came from — "mock" until GEMINI_API_KEY is configured. */
 export type AiSource = "gemini" | "mock";
 

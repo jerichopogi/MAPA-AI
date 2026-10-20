@@ -19,7 +19,12 @@ export interface Trip {
   experienceItinerary: Itinerary | null;
   bookingSuggestions: BookingSuggestions | null;
   notes: string;
+  /** Token for the public share link (/s/:shareId); null when not shared. */
+  shareId: string | null;
+  /** Departure date (YYYY-MM-DD), used for email reminders. */
+  startDate: string | null;
+  remindersEnabled: boolean;
   createdAt: string;
 }
 
-export type NewTrip = Omit<Trip, "id" | "createdAt" | "status" | "notes">;
+export type NewTrip = Omit<Trip, "id" | "createdAt" | "status" | "notes" | "shareId" | "startDate" | "remindersEnabled">;

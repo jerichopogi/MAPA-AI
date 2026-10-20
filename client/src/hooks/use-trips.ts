@@ -20,6 +20,9 @@ interface TripRow {
   experience_itinerary: Trip["experienceItinerary"];
   booking_suggestions: Trip["bookingSuggestions"];
   notes: string;
+  share_id: string | null;
+  start_date: string | null;
+  reminders_enabled: boolean;
   created_at: string;
 }
 
@@ -39,6 +42,9 @@ const fromRow = (r: TripRow): Trip => ({
   experienceItinerary: r.experience_itinerary,
   bookingSuggestions: r.booking_suggestions,
   notes: r.notes,
+  shareId: r.share_id,
+  startDate: r.start_date,
+  remindersEnabled: r.reminders_enabled ?? true,
   createdAt: r.created_at,
 });
 
@@ -101,11 +107,23 @@ export function useCreateTrip() {
   });
 }
 
+type TripPatch = Partial<Pick<Trip, "name" | "status" | "notes" | "shareId" | "startDate" | "remindersEnabled">>;
+
 export function useUpdateTrip(id: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (patch: Partial<Pick<Trip, "name" | "status" | "notes">>) => {
-      const { data, error } = await requireSupabase().from("trips").update(patch).eq("id", id).select().single();
+    mutationFn: async (patch: TripPatch) => {
+      const row = {
+        name: patch.name,
+        status: patch.status,
+        notes: patch.notes,
+        share_id: patch.shareId,
+        start_date: patch.startDate,
+        reminders_enabled: patch.remindersEnabled,
+      };
+      // Only send fields that were provided (undefined would be dropped anyway, null clears).
+      const changes = Object.fromEntries(Object.entries(row).filter(([, v]) => v !== undefined));
+      const { data, error } = await requireSupabase().from("trips").update(changes).eq("id", id).select().single();
       if (error) throw error;
       return fromRow(data as TripRow);
     },

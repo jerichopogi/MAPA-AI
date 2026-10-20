@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { aiApi, isQuotaError } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { Routes, countryImage } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 
@@ -15,6 +16,7 @@ const isoDate = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 6000
 /** "Where should I go?" — AI ranks the best countries for a chosen departure date. */
 export function DestinationIdeas() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [date, setDate] = useState(() => isoDate(new Date(Date.now() + 30 * 864e5)));
   const [days, setDays] = useState(5);
   const [budget, setBudget] = useState(50000);
@@ -36,16 +38,16 @@ export function DestinationIdeas() {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-medium">
-            <Compass className="h-5 w-5 text-primary" /> Where should I go?
+            <Compass className="h-5 w-5 text-primary" /> {t("Where should I go?")}
           </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Pick a date — we'll rank the best countries for that time of year.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t("Pick a date — we'll rank the best countries for that time of year.")}</p>
         </div>
         {ideas.data && <AiSourceBadge source={ideas.data.source} />}
       </div>
 
       <form onSubmit={submit} className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-[1.2fr_0.7fr_1fr_auto] sm:items-end">
         <label className="col-span-2 space-y-1.5 text-sm sm:col-span-1">
-          <span className="text-muted-foreground">Leaving on</span>
+          <span className="text-muted-foreground">{t("Leaving on")}</span>
           <div className="relative">
             <CalendarDays className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             {/* The native picker icon is stretched invisibly over the field, so a click anywhere opens the calendar. */}
@@ -60,15 +62,15 @@ export function DestinationIdeas() {
           </div>
         </label>
         <label className="space-y-1.5 text-sm">
-          <span className="text-muted-foreground">Days</span>
+          <span className="text-muted-foreground">{t("Days")}</span>
           <Input type="number" min={1} max={30} value={days} onChange={(e) => setDays(Math.min(30, Math.max(1, e.target.valueAsNumber || 1)))} />
         </label>
         <label className="space-y-1.5 text-sm">
-          <span className="text-muted-foreground">Budget (₱, with flights)</span>
+          <span className="text-muted-foreground">{t("Budget (₱, with flights)")}</span>
           <Input type="number" min={1000} value={budget} onChange={(e) => setBudget(e.target.valueAsNumber || 0)} />
         </label>
         <Button type="submit" className="col-span-2 sm:col-span-1" disabled={ideas.isPending || !date}>
-          {ideas.isPending ? <Loader2 className="animate-spin" /> : <Search />} Find places
+          {ideas.isPending ? <Loader2 className="animate-spin" /> : <Search />} {t("Find places")}
         </Button>
       </form>
 
@@ -103,7 +105,7 @@ export function DestinationIdeas() {
                 </ul>
                 <Button size="sm" variant="outline" className="mt-4 self-start" asChild>
                   <Link href={`${Routes.NEW_TRIP}?${new URLSearchParams({ country: idea.countryCode, month: String(month), days: String(ideas.variables!.days), budget: String(ideas.variables!.budget) })}`}>
-                    Plan this trip
+                    {t("Plan this trip")}
                   </Link>
                 </Button>
               </div>

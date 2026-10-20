@@ -11,6 +11,7 @@ import type {
   VisaRequirement,
 } from "@shared/schema";
 import type { BillingStatus, ProductId } from "@shared/plans";
+import { getStoredLang } from "./i18n";
 import { queryClient } from "./query-client";
 import { supabase } from "./supabase";
 
@@ -40,6 +41,8 @@ async function request<T>(method: "GET" | "POST", path: string, body?: unknown):
     headers: {
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      // AI answers follow the interface language.
+      "X-Lang": getStoredLang(),
     },
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });

@@ -2,6 +2,7 @@ import { BedDouble, UtensilsCrossed } from "lucide-react";
 import type { DailyPlan, Itinerary } from "@shared/schema";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n";
 
 function DayCard({ day, currency }: { day: DailyPlan; currency: string }) {
   const meals = day.meals.breakfast.cost + day.meals.lunch.cost + day.meals.dinner.cost;
@@ -41,17 +42,18 @@ function DayCard({ day, currency }: { day: DailyPlan; currency: string }) {
 }
 
 function ItineraryPanel({ itinerary, currency, budget }: { itinerary: Itinerary; currency: string; budget?: number }) {
+  const { t } = useI18n();
   const overBudget = budget !== undefined && itinerary.totalCost > budget;
   return (
     <div>
       <div className="mb-5 flex flex-col gap-4 rounded-xl bg-muted/60 p-5 sm:flex-row sm:items-center sm:justify-between">
         <p className="max-w-xl text-sm text-muted-foreground">{itinerary.summary}</p>
         <div className="shrink-0 sm:text-right">
-          <p className="text-xs text-muted-foreground">Estimated total</p>
+          <p className="text-xs text-muted-foreground">{t("Estimated total")}</p>
           <p className="text-xl font-semibold tabular-nums">{formatCurrency(itinerary.totalCost, currency)}</p>
           {budget !== undefined && (
             <p className={overBudget ? "text-xs text-amber-600 dark:text-amber-400" : "text-xs text-emerald-600 dark:text-emerald-400"}>
-              {overBudget ? `${formatCurrency(itinerary.totalCost - budget, currency)} over budget` : "Within budget"}
+              {overBudget ? `${formatCurrency(itinerary.totalCost - budget, currency)} over budget` : t("Within budget")}
             </p>
           )}
         </div>
@@ -77,11 +79,12 @@ export function ItineraryView({
   currency: string;
   budget?: number;
 }) {
+  const { t } = useI18n();
   return (
     <Tabs defaultValue="budget">
       <TabsList className="mb-5 grid w-full grid-cols-2 sm:w-auto sm:inline-grid">
-        <TabsTrigger value="budget">Budget plan</TabsTrigger>
-        <TabsTrigger value="experience">Experience plan</TabsTrigger>
+        <TabsTrigger value="budget">{t("Budget plan")}</TabsTrigger>
+        <TabsTrigger value="experience">{t("Experience plan")}</TabsTrigger>
       </TabsList>
       <TabsContent value="budget">
         <ItineraryPanel itinerary={budgetItinerary} currency={currency} budget={budget} />

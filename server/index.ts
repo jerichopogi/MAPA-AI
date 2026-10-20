@@ -3,6 +3,7 @@ import express, { type NextFunction, type Request, type Response } from "express
 import { createServer } from "http";
 import { api } from "./routes";
 import { serveStatic } from "./static";
+import { startReminderScheduler } from "./reminders";
 import { log } from "./log";
 
 const app = express();
@@ -53,4 +54,5 @@ server.listen(config.port, () => {
         : "Payments: off (set SUPABASE_SERVICE_ROLE_KEY to enable plans)",
     "setup",
   );
+  startReminderScheduler();
 });

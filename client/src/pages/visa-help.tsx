@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { aiApi, isQuotaError } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const PURPOSES = [
@@ -26,6 +27,7 @@ const PURPOSES = [
 
 export default function VisaHelp() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const form = useForm<VisaQueryInput>({
     resolver: zodResolver(visaQuerySchema),
     defaultValues: { destination: "", purpose: "tourism", duration: 7, hasVisitedBefore: false },
@@ -39,7 +41,7 @@ export default function VisaHelp() {
 
   return (
     <>
-      <PageHeader title="Visa help" description="Requirements for Philippine passport holders, in plain language." />
+      <PageHeader title={t("Visa help")} description={t("Requirements for Philippine passport holders, in plain language.")} />
 
       <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
         <Form {...form}>

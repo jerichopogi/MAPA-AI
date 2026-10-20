@@ -70,6 +70,21 @@ the service-role key. For PayPal it is triggered by
 (checking amount and currency) before activating; for PayMongo also by its webhook. Users can read, but never write, `subscriptions`,
 `payments` and `ai_usage`.
 
+### Sharing, reminders, limits, language
+
+- **Shared trips** are read through `get_shared_trip(token)`, a security-definer
+  SQL function that returns only safe columns for an exact, 16+ character token,
+  so shared trips can't be listed or enumerated. `server/share-meta.ts` adds
+  Open Graph tags to `/s/:token` pages for chat-app previews.
+- **Reminders** (`server/reminders/`) run hourly in the server process. Each
+  `(trip, kind)` is claimed in `trip_reminders` before sending (unique key), so
+  emails go out once even across restarts; a failed send releases the claim.
+- **Rate limits** (`server/middleware/rate-limit.ts`) run before the plan quota on
+  every AI route: an in-memory per-minute window and a daily count from `ai_usage`.
+  With several server instances, move the minute window to a shared store.
+- **Language**: the client sends `X-Lang: en|tl`; Gemini prompts add a Taglish
+  instruction while keeping JSON keys and enum values in English.
+
 ## Data model
 
 See [`supabase/migrations/`](../supabase/migrations). Summary:

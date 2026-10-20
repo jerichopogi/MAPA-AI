@@ -28,6 +28,11 @@ export const config = {
     webhookSecret: env.PAYMONGO_WEBHOOK_SECRET || "",
     methods: (env.PAYMONGO_METHODS || "gcash,paymaya,card").split(",").map((m) => m.trim()).filter(Boolean),
   },
+  email: {
+    /** Resend API key (resend.com). Without it, reminder emails are only logged. */
+    resendApiKey: env.RESEND_API_KEY || "",
+    from: env.EMAIL_FROM || "MAPA AI <onboarding@resend.dev>",
+  },
   /** Public URL of the app, used for payment redirect links. */
   appUrl: env.APP_URL || "",
   gemini: {

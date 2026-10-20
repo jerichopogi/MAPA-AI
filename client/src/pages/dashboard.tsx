@@ -6,6 +6,7 @@ import { TripCard, TripCardSkeleton } from "@/components/trips/trip-card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useTrips } from "@/hooks/use-trips";
+import { useI18n } from "@/lib/i18n";
 import { DESTINATIONS, Routes, countryImage } from "@/lib/constants";
 
 const ACTIONS = [
@@ -22,14 +23,15 @@ function greeting() {
 
 export default function Dashboard() {
   const { displayName } = useAuth();
+  const { t } = useI18n();
   const { data: trips, isLoading } = useTrips();
   const recent = trips?.slice(0, 3) ?? [];
 
   return (
     <div className="space-y-12">
       <section>
-        <p className="text-sm text-muted-foreground">{greeting()},</p>
-        <h1 className="display mt-1 text-4xl">{displayName.split(" ")[0]} — where to next?</h1>
+        <p className="text-sm text-muted-foreground">{t(greeting())},</p>
+        <h1 className="display mt-1 text-4xl">{displayName.split(" ")[0]} — {t("where to next?")}</h1>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -38,8 +40,8 @@ export default function Dashboard() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
               <Icon className="h-4 w-4" />
             </div>
-            <h2 className="mt-4 font-medium">{title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{text}</p>
+            <h2 className="mt-4 font-medium">{t(title)}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t(text)}</p>
           </Link>
         ))}
       </section>
@@ -48,10 +50,10 @@ export default function Dashboard() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Recent trips</h2>
+          <h2 className="text-lg font-semibold">{t("Recent trips")}</h2>
           {recent.length > 0 && (
             <Link href={Routes.MY_TRIPS} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-              View all <ArrowRight className="h-3.5 w-3.5" />
+              {t("View all")} <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           )}
         </div>
@@ -70,12 +72,12 @@ export default function Dashboard() {
         ) : (
           <EmptyState
             icon={Luggage}
-            title="No trips yet"
-            description="Generate your first itinerary — it takes less than a minute."
+            title={t("No trips yet")}
+            description={t("Generate your first itinerary — it takes less than a minute.")}
             action={
               <Button asChild>
                 <Link href={Routes.NEW_TRIP}>
-                  <Sparkles /> Plan a trip
+                  <Sparkles /> {t("Plan a trip")}
                 </Link>
               </Button>
             }
@@ -84,7 +86,7 @@ export default function Dashboard() {
       </section>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold">Inspiration</h2>
+        <h2 className="mb-4 text-lg font-semibold">{t("Inspiration")}</h2>
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
           {DESTINATIONS.map((d) => (
             <Link key={d.name} href={Routes.NEW_TRIP} className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">

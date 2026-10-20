@@ -5,6 +5,8 @@ import { MAIN_AIRPORT } from "@shared/reference-data";
 import { airportName, cityName, countryName, monthName, preferenceName } from "@shared/reference-data";
 import { EmptyState } from "@/components/empty-state";
 import { BookThisTrip } from "@/components/trips/booking-suggestions";
+import { ShareTripDialog } from "@/components/trips/share-trip-dialog";
+import { TripReminders } from "@/components/trips/trip-reminders";
 import { ItineraryView } from "@/components/trips/itinerary-view";
 import { TripStatusBadge } from "@/components/trips/trip-status-badge";
 import {
@@ -23,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useDeleteTrip, useTrip, useUpdateTrip } from "@/hooks/use-trips";
+import { useI18n } from "@/lib/i18n";
 import { Routes, countryImage } from "@/lib/constants";
 import type { Trip, TripStatus } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -37,10 +40,11 @@ function Notes({ trip }: { trip: Trip }) {
   const { toast } = useToast();
   useEffect(() => setNotes(trip.notes), [trip.notes]);
   const dirty = notes !== trip.notes;
+  const { t } = useI18n();
 
   return (
-    <div className="rounded-xl border bg-card p-5">
-      <h2 className="font-medium">Notes</h2>
+    <div className="card-soft p-5">
+      <h2 className="font-medium">{t("Notes")}</h2>
       <Textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
@@ -61,7 +65,7 @@ function Notes({ trip }: { trip: Trip }) {
             )
           }
         >
-          {update.isPending && <Loader2 className="animate-spin" />} Save notes
+          {update.isPending && <Loader2 className="animate-spin" />} {t("Save notes")}
         </Button>
       </div>
     </div>
@@ -72,6 +76,7 @@ export default function TripDetails() {
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { t } = useI18n();
   const { data: trip, isLoading, error } = useTrip(id);
   const update = useUpdateTrip(id);
   const remove = useDeleteTrip();
@@ -146,16 +151,17 @@ export default function TripDetails() {
         </Select>
         <Button asChild>
           <a href="#book">
-            <ArrowDown /> Book this trip
+            <ArrowDown /> {t("Book this trip")}
           </a>
         </Button>
+        <ShareTripDialog trip={trip} />
         <Button variant="outline" onClick={() => window.print()}>
-          <Printer /> Print / PDF
+          <Printer /> {t("Print / PDF")}
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="ghost" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
-              <Trash2 /> Delete
+              <Trash2 /> {t("Delete")}
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
@@ -195,7 +201,7 @@ export default function TripDetails() {
 
       {trip.budgetItinerary && trip.experienceItinerary ? (
         <section>
-          <h2 className="mb-4 text-lg font-semibold">Itinerary</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("Itinerary")}</h2>
           <ItineraryView
             budgetItinerary={trip.budgetItinerary}
             experienceItinerary={trip.experienceItinerary}
@@ -213,7 +219,8 @@ export default function TripDetails() {
         where={tripWhere(trip)}
       />
 
-      <section className="no-print">
+      <section className="grid gap-4 no-print lg:grid-cols-2">
+        <TripReminders trip={trip} />
         <Notes trip={trip} />
       </section>
     </div>

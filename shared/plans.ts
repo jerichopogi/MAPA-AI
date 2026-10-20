@@ -54,3 +54,9 @@ export interface BillingStatus {
 
 export const pesos = (centavos: number) =>
   new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(centavos / 100);
+
+/** Abuse protection for every plan (Plus "unlimited" is subject to these too). */
+export const AI_RATE_LIMITS = {
+  perMinute: 10,
+  perDay: 100,
+};

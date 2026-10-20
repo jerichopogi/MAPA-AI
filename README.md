@@ -107,6 +107,25 @@ from the default, paste it into the matching `*_LINK` setting
 (placeholders: `{query}`, `{from}`, `{to}`, `{id}`, `{url}`). Restart `npm run dev`.
 A commission disclosure is shown under every set of suggestions.
 
+## 5. Sharing, reminders, limits and Taglish
+
+- **Shareable trips.** On a trip page, **Share** creates a private link
+  (`/s/<random token>`) that anyone can open without an account. It shows the
+  itinerary and booking links, but never notes, emails or dates. Messenger and
+  Viber show a preview (title and photo). **Stop sharing** kills the link.
+- **Trip reminders.** Set a **departure date** on a trip to get emails 30 and 7
+  days before you fly (visa deadline, packing list, booking links). The server
+  checks every hour and sends each reminder once. Add `RESEND_API_KEY` (and a
+  verified `EMAIL_FROM`) to send for real; without it reminders are only logged.
+  Reminders need `SUPABASE_SERVICE_ROLE_KEY` and a server that stays running.
+- **AI limits (every plan).** 10 AI requests per minute and 100 per day per user
+  (day resets at midnight Philippine time). Change them in `AI_RATE_LIMITS` in
+  [`shared/plans.ts`](shared/plans.ts).
+- **English / Taglish.** The EN/TL switch (sidebar and top bar) changes the main
+  interface text and makes every AI answer reply in Taglish. Translations live in
+  [`client/src/lib/i18n.tsx`](client/src/lib/i18n.tsx); untranslated text falls
+  back to English.
+
 ## Scripts
 
 | Command | What it does |
@@ -131,6 +150,7 @@ A commission disclosure is shown under every set of suggestions.
 | `PAYPAL_ENV` | no (default `sandbox`) | server |
 | `PAYMONGO_SECRET_KEY` | alternative to PayPal | server only |
 | `APP_URL` | production | server |
+| `RESEND_API_KEY`, `EMAIL_FROM` | for reminder emails | server only |
 | `PORT` | no (default `5000`) | server |
 
 `.env` is git-ignored. Never commit real keys.

@@ -7,6 +7,7 @@ import { FormattedText } from "@/components/formatted-text";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { aiApi, isQuotaError } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type Message = ChatInput["messages"][number];
@@ -18,7 +19,15 @@ const SUGGESTIONS = [
   "Is ₱40,000 enough for 4 days in Tokyo?",
 ];
 
+const SUGGESTIONS_TL = [
+  "Ano ang dapat kong tandaan pag bibisita sa mga temple sa Kyoto?",
+  "Anong mga festival ang meron sa Thailand tuwing November?",
+  "Anong Korean food ang dapat kong i-try sa Busan?",
+  "Kasya ba ang ₱40,000 para sa 4 days sa Tokyo?",
+];
+
 export default function Assistant() {
+  const { t, lang } = useI18n();
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState("");
   const [source, setSource] = useState<AiSource | null>(null);
@@ -53,8 +62,8 @@ export default function Assistant() {
     <div className="flex min-h-[calc(100vh-10rem)] flex-col">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="display text-3xl sm:text-4xl">Assistant</h1>
-          <p className="mt-1.5 text-muted-foreground">Ask about countries, places, culture, traditions and trip planning.</p>
+          <h1 className="display text-3xl sm:text-4xl">{t("Assistant")}</h1>
+          <p className="mt-1.5 text-muted-foreground">{t("Ask about countries, places, culture, traditions and trip planning.")}</p>
         </div>
         {source && <AiSourceBadge source={source} />}
       </div>
@@ -63,10 +72,10 @@ export default function Assistant() {
         {messages.length === 0 && (
           <div className="rounded-xl border border-dashed p-6">
             <div className="flex items-center gap-2 text-sm font-medium">
-              <Sparkles className="h-4 w-4 text-primary" /> Try asking
+              <Sparkles className="h-4 w-4 text-primary" /> {t("Try asking")}
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {SUGGESTIONS.map((s) => (
+              {(lang === "tl" ? SUGGESTIONS_TL : SUGGESTIONS).map((s) => (
                 <button key={s} onClick={() => submit(s)} className="rounded-lg border bg-card px-4 py-3 text-left text-sm transition-colors hover:border-primary/40">
                   {s}
                 </button>
@@ -90,7 +99,7 @@ export default function Assistant() {
 
         {send.isPending && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" /> Thinking…
+            <Loader2 className="h-4 w-4 animate-spin" /> {t("Thinking…")}
           </div>
         )}
         <div ref={endRef} />
@@ -113,7 +122,7 @@ export default function Assistant() {
                 submit(draft);
               }
             }}
-            placeholder="Ask about a place, its culture, traditions, food or getting around…"
+            placeholder={t("Ask about a place, its culture, traditions, food or getting around…")}
             rows={2}
             className="resize-none border-0 pr-14 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           />

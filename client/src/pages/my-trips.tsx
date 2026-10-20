@@ -8,6 +8,7 @@ import { TripCard, TripCardSkeleton } from "@/components/trips/trip-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTrips } from "@/hooks/use-trips";
+import { useI18n } from "@/lib/i18n";
 import { Routes } from "@/lib/constants";
 import type { TripStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ const FILTERS: { value: TripStatus | "all"; label: string }[] = [
 
 export default function MyTrips() {
   const { data: trips = [], isLoading, error } = useTrips();
+  const { t } = useI18n();
   const [filter, setFilter] = useState<TripStatus | "all">("all");
   const [query, setQuery] = useState("");
 
@@ -40,8 +42,8 @@ export default function MyTrips() {
   return (
     <>
       <PageHeader
-        title="My trips"
-        description="Every itinerary you've saved."
+        title={t("My trips")}
+        description={t("Every itinerary you've saved.")}
         actions={
           <Button asChild>
             <Link href={Routes.NEW_TRIP}>

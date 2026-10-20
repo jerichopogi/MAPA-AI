@@ -6,6 +6,7 @@ import type {
   DestinationIdea,
   DestinationIdeasInput,
   GenerateTripInput,
+  Lang,
   GeneratedTrip,
   LocalPlace,
   LocalSecretsQueryInput,
@@ -27,10 +28,10 @@ async function run<T>(live: () => Promise<T>, fallback: () => T): Promise<AiResu
   return { source: "gemini", data: await live() };
 }
 
-export const generateTrip = (input: GenerateTripInput) =>
+export const generateTrip = (input: GenerateTripInput, lang: Lang = "en") =>
   run<GeneratedTrip>(
     async () => {
-      const trip = await gemini.generateJson<GeneratedTrip>(tripPrompt(input));
+      const trip = await gemini.generateJson<GeneratedTrip>(tripPrompt(input), lang);
       // The model occasionally drops a list; normalise so the UI can rely on arrays.
       const b = trip.bookings;
       trip.bookings = {
@@ -43,27 +44,27 @@ export const generateTrip = (input: GenerateTripInput) =>
     () => mock.mockTrip(input),
   );
 
-export const visaRequirements = (input: VisaQueryInput) =>
-  run<VisaRequirement>(() => gemini.generateJson(visaPrompt(input)), () => mock.mockVisa(input));
+export const visaRequirements = (input: VisaQueryInput, lang: Lang = "en") =>
+  run<VisaRequirement>(() => gemini.generateJson(visaPrompt(input), lang), () => mock.mockVisa(input));
 
-export const localSecrets = (input: LocalSecretsQueryInput) =>
+export const localSecrets = (input: LocalSecretsQueryInput, lang: Lang = "en") =>
   run<LocalPlace[]>(
-    async () => (await gemini.generateJson<{ places: LocalPlace[] }>(localSecretsPrompt(input))).places,
+    async () => (await gemini.generateJson<{ places: LocalPlace[] }>(localSecretsPrompt(input), lang)).places,
     () => mock.mockLocalSecrets(input),
   );
 
-export const chat = (input: ChatInput) =>
+export const chat = (input: ChatInput, lang: Lang = "en") =>
   run<string>(
-    () => gemini.chat(input.messages),
+    () => gemini.chat(input.messages, lang),
     () => mock.mockChat(input.messages[input.messages.length - 1].content),
   );
 
 const KNOWN_COUNTRIES = new Set(COUNTRIES.map((c) => c.code));
 
-export const destinationIdeas = (input: DestinationIdeasInput) =>
+export const destinationIdeas = (input: DestinationIdeasInput, lang: Lang = "en") =>
   run<DestinationIdea[]>(
     async () => {
-      const { ideas } = await gemini.generateJson<{ ideas: DestinationIdea[] }>(destinationIdeasPrompt(input));
+      const { ideas } = await gemini.generateJson<{ ideas: DestinationIdea[] }>(destinationIdeasPrompt(input), lang);
       // Only keep countries the planner supports, so "Plan this trip" always works.
       return ideas.filter((i) => KNOWN_COUNTRIES.has(i.countryCode)).slice(0, 4);
     },

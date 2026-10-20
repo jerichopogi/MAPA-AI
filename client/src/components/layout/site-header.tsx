@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { Menu, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
+import { LanguageToggle } from "@/components/language-toggle";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
@@ -36,6 +37,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <LanguageToggle className="bg-background shadow-sm" />
           <div className="rounded-full bg-background shadow-sm">
             <ThemeToggle />
           </div>
@@ -54,6 +56,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle className="bg-background shadow-sm" />
           <div className="rounded-full bg-background shadow-sm">
             <ThemeToggle />
           </div>

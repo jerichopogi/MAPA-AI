@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { aiApi, isQuotaError } from "@/lib/api";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 type Category = LocalSecretsQueryInput["category"];
@@ -26,6 +27,7 @@ const QUICK_CITIES = ["Tokyo", "Seoul", "Taipei", "Bangkok", "Singapore", "Hanoi
 
 export default function LocalSecrets() {
   const { toast } = useToast();
+  const { t } = useI18n();
   const [city, setCity] = useState("");
   const [category, setCategory] = useState<Category>("food");
 
@@ -41,7 +43,7 @@ export default function LocalSecrets() {
 
   return (
     <>
-      <PageHeader title="Local secrets" description="The places locals love and tourists usually miss." />
+      <PageHeader title={t("Local secrets")} description={t("The places locals love and tourists usually miss.")} />
 
       <form
         onSubmit={(e) => {

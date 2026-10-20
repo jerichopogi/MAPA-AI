@@ -5,6 +5,7 @@ import { ProtectedRoute } from "@/components/protected-route";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
+import { I18nProvider } from "@/lib/i18n";
 import { Routes } from "@/lib/constants";
 import { queryClient } from "@/lib/query-client";
 
@@ -27,6 +28,7 @@ import Pricing from "@/pages/pricing";
 import Billing from "@/pages/billing";
 import BillingSuccess from "@/pages/billing-success";
 import TestCheckout from "@/pages/test-checkout";
+import SharedTripPage from "@/pages/shared-trip";
 import NotFound from "@/pages/not-found";
 
 const PROTECTED = [
@@ -48,6 +50,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system">
+        <I18nProvider>
         <AuthProvider>
           <Switch>
             <Route path={Routes.HOME} component={Landing} />
@@ -57,6 +60,7 @@ export default function App() {
             <Route path={Routes.RESET_PASSWORD} component={ResetPassword} />
             <Route path={Routes.VERIFY_EMAIL} component={VerifyEmail} />
             <Route path={Routes.PRICING} component={Pricing} />
+            <Route path="/s/:shareId" component={SharedTripPage} />
             {PROTECTED.map(([path, Page]) => (
               <Route key={path} path={path}>
                 <ProtectedRoute component={Page} />
@@ -67,6 +71,7 @@ export default function App() {
           <UpgradeDialog />
           <Toaster />
         </AuthProvider>
+        </I18nProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

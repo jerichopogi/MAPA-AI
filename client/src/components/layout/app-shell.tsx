@@ -14,12 +14,14 @@ import {
   Luggage,
 } from "lucide-react";
 import { PlanCard } from "@/components/billing/plan-card";
+import { LanguageToggle } from "@/components/language-toggle";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/lib/i18n";
 import { Routes } from "@/lib/constants";
 import { cn, getInitials } from "@/lib/utils";
 
@@ -43,6 +45,7 @@ function isActive(location: string, href: string) {
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const [location] = useLocation();
+  const { t } = useI18n();
   return (
     <nav className="flex flex-col gap-0.5">
       {NAV.map(({ href, label, icon: Icon }) => (
@@ -58,7 +61,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
           )}
         >
           <Icon className="h-4 w-4" />
-          {label}
+          {t(label)}
         </Link>
       ))}
     </nav>
@@ -66,6 +69,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function UserMenu() {
+  const { t } = useI18n();
   const { displayName, user, signOut } = useAuth();
   const [, navigate] = useLocation();
   return (
@@ -82,7 +86,7 @@ function UserMenu() {
       <Button
         variant="ghost"
         size="icon"
-        aria-label="Sign out"
+        aria-label={t("Sign out")}
         onClick={async () => {
           await signOut();
           navigate(Routes.HOME);
@@ -95,15 +99,19 @@ function UserMenu() {
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="flex h-full flex-col gap-6 overflow-y-auto p-4">
       <div className="flex items-center justify-between px-1">
         <Logo href={Routes.DASHBOARD} />
-        <ThemeToggle />
+        <div className="flex items-center gap-1">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
       </div>
       <Button asChild className="w-full">
         <Link href={Routes.NEW_TRIP} onClick={onNavigate}>
-          <Plus /> Plan a trip
+          <Plus /> {t("Plan a trip")}
         </Link>
       </Button>
       <NavLinks onNavigate={onNavigate} />
@@ -120,6 +128,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 /** Layout for signed-in pages: sidebar on desktop, top bar + bottom tabs on mobile. */
 export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const { t } = useI18n();
   const [location] = useLocation();
 
   return (
@@ -158,7 +167,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             )}
           >
             <Icon className="h-5 w-5" />
-            {label}
+            {t(label)}
           </Link>
         ))}
       </nav>
