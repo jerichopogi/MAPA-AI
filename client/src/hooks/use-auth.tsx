@@ -22,8 +22,17 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const redirectTo = (path: string) => `${window.location.origin}${path}`;
 
-function unwrap<T extends { error: { message: string } | null }>(result: T): T {
-  if (result.error) throw new Error(result.error.message);
+// Plain-language versions of Supabase Auth errors users commonly hit.
+const AUTH_ERRORS: Record<string, string> = {
+  over_email_send_rate_limit:
+    "Too many emails were sent in the last hour. Please wait a bit and try again.",
+  email_not_confirmed: "Please confirm your email first — check your inbox (and spam folder).",
+  invalid_credentials: "Wrong email or password.",
+  email_address_invalid: "That email address can't receive mail. Please use another one.",
+};
+
+function unwrap<T extends { error: { message: string; code?: string } | null }>(result: T): T {
+  if (result.error) throw new Error(AUTH_ERRORS[result.error.code ?? ""] ?? result.error.message);
   return result;
 }
 
@@ -71,6 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           options: { data: { full_name: fullName }, emailRedirectTo: redirectTo("/dashboard") },
         }),
       );
+      // An already-registered email gets a fake user with no identities and no
+      // email is sent (Supabase hides which emails exist). Point them to sign in.
+      if (data.user && data.user.identities?.length === 0) {
+        throw new Error("This email already has an account. Sign in instead, or reset your password.");
+      }
       // With email confirmation on, Supabase returns a user but no session.
       return { needsConfirmation: !data.session };
     },
