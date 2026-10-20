@@ -1,0 +1,325 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
+import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
+import { generateTripSchema, type AiResult, type GenerateTripInput, type GeneratedTrip } from "@shared/schema";
+import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MONTHS, PREFERENCES } from "@shared/reference-data";
+import { AiSourceBadge } from "@/components/ai-source-badge";
+import { PageHeader } from "@/components/layout/app-shell";
+import { PreferenceIcon } from "@/components/preference-icon";
+import { ItineraryView } from "@/components/trips/itinerary-view";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useCreateTrip } from "@/hooks/use-trips";
+import { aiApi } from "@/lib/api";
+import { tripPath } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
+function Chip({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition-colors",
+        selected ? "border-primary bg-accent text-accent-foreground" : "hover:bg-muted",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function toggle(list: string[], value: string) {
+  return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
+}
+
+export default function PlanTrip() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const [result, setResult] = useState<{ input: GenerateTripInput; response: AiResult<GeneratedTrip> } | null>(null);
+  const createTrip = useCreateTrip();
+
+  const form = useForm<GenerateTripInput>({
+    resolver: zodResolver(generateTripSchema),
+    defaultValues: {
+      originAirport: "MNL",
+      destinationCountry: "",
+      travelMonth: ((new Date().getMonth() + 1) % 12) + 1,
+      currency: "PHP",
+      duration: 5,
+      budget: 50000,
+      preferences: [],
+      selectedCities: [],
+    },
+  });
+
+  const country = form.watch("destinationCountry");
+  const cities = CITIES_BY_COUNTRY[country] ?? [];
+
+  const generate = useMutation({
+    mutationFn: aiApi.generateTrip,
+    onSuccess: (response, input) => {
+      setResult({ input, response });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    onError: (error) => toast({ title: "Couldn't generate a trip", description: error.message, variant: "destructive" }),
+  });
+
+  async function save() {
+    if (!result) return;
+    const { input, response } = result;
+    try {
+      const trip = await createTrip.mutateAsync({
+        name: response.data.tripName,
+        originAirport: input.originAirport,
+        destinationCountry: input.destinationCountry,
+        selectedCities: input.selectedCities ?? [],
+        travelMonth: input.travelMonth,
+        duration: input.duration,
+        currency: input.currency,
+        budget: input.budget,
+        preferences: input.preferences,
+        budgetItinerary: response.data.budgetItinerary,
+        experienceItinerary: response.data.experienceItinerary,
+      });
+      toast({ title: "Trip saved", description: "Find it any time under My trips." });
+      navigate(tripPath(trip.id));
+    } catch (error) {
+      toast({ title: "Couldn't save trip", description: (error as Error).message, variant: "destructive" });
+    }
+  }
+
+  if (result) {
+    const { input, response } = result;
+    return (
+      <>
+        <Button variant="ghost" size="sm" className="-ml-3 mb-4" onClick={() => setResult(null)}>
+          <ArrowLeft /> Edit details
+        </Button>
+        <PageHeader
+          title={response.data.tripName}
+          description="Two plans for the same trip — compare them and save the one you like."
+          actions={
+            <>
+              <Button variant="outline" onClick={() => generate.mutate(input)} disabled={generate.isPending}>
+                {generate.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} Regenerate
+              </Button>
+              <Button onClick={save} disabled={createTrip.isPending}>
+                {createTrip.isPending ? <Loader2 className="animate-spin" /> : <Save />} Save trip
+              </Button>
+            </>
+          }
+        />
+        <AiSourceBadge source={response.source} className="mb-5" />
+        <ItineraryView
+          budgetItinerary={response.data.budgetItinerary}
+          experienceItinerary={response.data.experienceItinerary}
+          currency={input.currency}
+          budget={input.budget}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <PageHeader title="Plan a trip" description="Tell us the basics. We'll draft a budget plan and an experience plan." />
+
+      <Form {...form}>
+        <form noValidate onSubmit={form.handleSubmit((values) => generate.mutate(values))} className="space-y-10">
+          <section className="grid gap-5 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="destinationCountry"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Where to?</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) => {
+                      field.onChange(v);
+                      form.setValue("selectedCities", []);
+                    }}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a country" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="originAirport"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Flying from</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose an airport" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {AIRPORTS.map((a) => (
+                        <SelectItem key={a.code} value={a.code}>
+                          {a.name} ({a.code})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="travelMonth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>When</FormLabel>
+                  <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {MONTHS.map((m, i) => (
+                        <SelectItem key={m} value={String(i + 1)}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>How many days</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={1} max={30} {...field} onChange={(e) => field.onChange(e.target.valueAsNumber || 0)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="grid grid-cols-[7rem_1fr] gap-3 sm:col-span-2">
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CURRENCIES.map((c) => (
+                          <SelectItem key={c.code} value={c.code}>
+                            {c.code}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="budget"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Total budget</FormLabel>
+                    <FormControl>
+                      <Input type="number" min={1} {...field} onChange={(e) => field.onChange(e.target.valueAsNumber || 0)} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+
+          {cities.length > 1 && (
+            <FormField
+              control={form.control}
+              name="selectedCities"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cities to include</FormLabel>
+                  <p className="text-sm text-muted-foreground">Optional — leave empty and we'll pick the highlights.</p>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {cities.map((c) => (
+                      <Chip key={c.code} selected={field.value?.includes(c.code) ?? false} onClick={() => field.onChange(toggle(field.value ?? [], c.code))}>
+                        {c.name}
+                      </Chip>
+                    ))}
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="preferences"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>What do you enjoy?</FormLabel>
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {PREFERENCES.map((p) => (
+                    <Chip key={p.code} selected={field.value.includes(p.code)} onClick={() => field.onChange(toggle(field.value, p.code))}>
+                      <PreferenceIcon name={p.icon} className="h-4 w-4" />
+                      {p.name}
+                    </Chip>
+                  ))}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end border-t pt-6">
+            <Button type="submit" size="lg" disabled={generate.isPending} className="w-full sm:w-auto">
+              {generate.isPending ? (
+                <>
+                  <Loader2 className="animate-spin" /> Planning your trip…
+                </>
+              ) : (
+                <>
+                  <Sparkles /> Generate itineraries
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </>
+  );
+}

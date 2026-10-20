@@ -3,405 +3,82 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 189 82% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 44%;
+    --accent: 189 55% 95%;
+    --accent-foreground: 189 82% 22%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 91%;
+    --input: 240 6% 88%;
+    --ring: 189 82% 29%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 7% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 7% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 188 62% 56%;
+    --primary-foreground: 240 10% 4%;
+    --secondary: 240 4% 13%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 13%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 189 35% 14%;
+    --accent-foreground: 188 62% 72%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 20%;
+    --ring: 188 62% 56%;
+  }
+
   * {
     @apply border-border;
   }
 
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
+  html {
+    scroll-behavior: smooth;
   }
 
-  :root {
-    --secondary-color: #EAB308;
-    --primary-color: #40A9BC;
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  h1, h2, h3, h4 {
+    @apply tracking-tight;
   }
 }
 
 @layer components {
-  .hero-gradient {
-    @apply bg-gradient-to-r from-[#40A9BC] to-[#40A9BC]/80 dark:from-[#40A9BC]/90 dark:to-[#40A9BC]/70;
-  }
-  
-  .secondary-gradient {
-    @apply bg-gradient-to-r from-[#EAB308] to-[#EAB308]/90 dark:from-[#EAB308]/90 dark:to-[#EAB308]/70;
+  /* Page container used across marketing and app pages. */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
-  .float-animation {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .pulse-animation {
-    animation: pulse 3s ease-in-out infinite;
-  }
-  
-  .slide-in-left {
-    animation: slideInLeft 0.5s ease-out forwards;
-  }
-  
-  .slide-in-right {
-    animation: slideInRight 0.5s ease-out forwards;
-  }
-  
-  .slide-in-up {
-    animation: slideInUp 0.6s ease-out forwards;
-  }
-  
-  .fade-in {
-    animation: fadeIn 0.8s ease-out forwards;
-  }
-  
-  .fade-in-up {
-    animation: fadeInUp 0.7s ease-out forwards;
-  }
-  
-  .btn-hover-effect {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
-  }
-  
-  .card-hover-effect {
-    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-lg;
-  }
-  
-  /* Feature, Destination, and Testimonial card animations */
-  .feature-animate {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.5s ease-out forwards;
-  }
-  
-  .feature-card-0 {
-    animation-delay: 0.1s;
-  }
-  
-  .feature-card-1 {
-    animation-delay: 0.3s;
-  }
-  
-  .feature-card-2 {
-    animation-delay: 0.5s;
-  }
-  
-  .feature-item {
-    opacity: 0;
-    animation: fadeInLeft 0.5s ease-out forwards;
-  }
-  
-  .feature-item:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-  
-  .feature-item:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-  
-  .feature-item:nth-child(3) {
-    animation-delay: 0.3s;
-  }
-  
-  .feature-item:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-  
-  .destination-animate {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.5s ease-out forwards;
-  }
-  
-  .destination-card-0 {
-    animation-delay: 0.1s;
-  }
-  
-  .destination-card-1 {
-    animation-delay: 0.3s;
-  }
-  
-  .destination-card-2 {
-    animation-delay: 0.5s;
-  }
-  
-  .testimonial-animate {
-    opacity: 0;
-    transform: scale(0.9);
-    animation: zoomIn 0.5s ease-out forwards;
-  }
-  
-  .testimonial-card-0 {
-    animation-delay: 0.1s;
-  }
-  
-  .testimonial-card-1 {
-    animation-delay: 0.3s;
-  }
-  
-  .testimonial-card-2 {
-    animation-delay: 0.5s;
-  }
-  
-  .cta-buttons > * {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease-out forwards;
-  }
-  
-  .cta-buttons > *:nth-child(1) {
-    animation-delay: 0.1s;
-  }
-  
-  .cta-buttons > *:nth-child(2) {
-    animation-delay: 0.3s;
-  }
-  
-  .ai-chat-animation {
-    animation: glow 3s ease-in-out infinite;
-  }
-  
-  .animate-bounce-x {
-    animation: bounceX 1s infinite;
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse 6s infinite;
-  }
-  
-  /* Hero divider styles */
-  .divider-container {
-    position: relative;
-    width: 100%;
-    height: 50px;
-    overflow: hidden;
-  }
-  
-  .hero-divider {
-    position: relative;
-    height: 100%;
-  }
-  
-  .divider-inner {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 50px;
-    background-color: white;
-    clip-path: polygon(0 100%, 100% 100%, 100% 0, 80% 40%, 50% 0, 20% 40%, 0 0);
-  }
-  
-  /* CTA section divider styles */
-  .cta-divider {
-    position: relative;
-    width: 100%;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .divider-line {
-    position: relative;
-    width: 100%;
-    max-width: 200px;
-    height: 2px;
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-  
-  .divider-dots {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    gap: 10px;
-  }
-  
-  .divider-dots span {
-    width: 8px;
-    height: 8px;
-    background-color: white;
-    border-radius: 50%;
-    display: block;
-  }
-  
-  .divider-dots span:nth-child(1) {
-    animation: pulse 2s infinite;
-    animation-delay: 0s;
-  }
-  
-  .divider-dots span:nth-child(2) {
-    animation: pulse 2s infinite;
-    animation-delay: 0.3s;
-  }
-  
-  .divider-dots span:nth-child(3) {
-    animation: pulse 2s infinite;
-    animation-delay: 0.6s;
-  }
-  
-  /* Infinite gallery scroll animation */
-  .gallery-scroll {
-    max-height: 540px;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .gallery-scroll-inner {
-    animation: scrollGallery 40s linear infinite;
-  }
-  
-  @keyframes scrollGallery {
-    0% {
-      transform: translateY(0);
-    }
-    100% {
-      transform: translateY(-50%);
-    }
-  }
-  
-  /* Apply hover pause effect to the scrolling gallery */
-  .gallery-scroll:hover .gallery-scroll-inner {
-    animation-play-state: paused;
-  }
-  
-  /* Smooth shadow overlays for top and bottom */
-  .gallery-scroll::after {
-    content: '';
-    position: absolute;
-    z-index: 1;
-    bottom: 0;
-    left: 0;
-    pointer-events: none;
-    width: 100%;
-    height: 20px;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.2));
-  }
-  
-  .gallery-scroll::before {
-    content: '';
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    width: 100%;
-    height: 20px;
-    background-image: linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,0.2));
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-primary;
   }
 }
 
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes zoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes bounceX {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(5px);
-  }
-}
-
-@keyframes glow {
-  0% {
-    box-shadow: 0 0 5px rgba(64, 169, 188, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(64, 169, 188, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 5px rgba(64, 169, 188, 0.2);
+@media print {
+  .no-print {
+    display: none !important;
   }
 }

@@ -1,158 +1,63 @@
-import { useState, useEffect } from "react";
-import { Switch, Route, useLocation } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider, useQuery } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { User } from "./lib/types";
-import { ApiEndpoints, Routes } from "./lib/constants";
-import { AuthProvider } from "@/hooks/use-auth";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Route, Switch } from "wouter";
+import { ProtectedRoute } from "@/components/protected-route";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/hooks/use-auth";
+import { Routes } from "@/lib/constants";
+import { queryClient } from "@/lib/query-client";
 
-// Pages
-import LandingPage from "@/pages/landing-page";
+import Landing from "@/pages/landing";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
-import Dashboard from "@/pages/dashboard";
-import MyTrips from "@/pages/my-trips";
-import LocalSecrets from "@/pages/local-secrets";
-import TravelInfo from "@/pages/travel-info";
-import VisaHelp from "@/pages/visa-help";
-import TravelPackage from "@/pages/travel-package";
-import TripDetails from "@/pages/trip-details";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import VerifyEmail from "@/pages/verify-email";
+import Dashboard from "@/pages/dashboard";
+import PlanTrip from "@/pages/plan-trip";
+import MyTrips from "@/pages/my-trips";
+import TripDetails from "@/pages/trip-details";
+import Assistant from "@/pages/assistant";
+import VisaHelp from "@/pages/visa-help";
+import LocalSecrets from "@/pages/local-secrets";
+import TravelInfo from "@/pages/travel-info";
+import TravelPackage from "@/pages/travel-package";
 import NotFound from "@/pages/not-found";
 
-// Create user context
-import { createContext } from "react";
-export const UserContext = createContext<{
-  user: User | null | undefined;
-  isLoading: boolean;
-  refetchUser: () => void;
-}>({
-  user: null,
-  isLoading: false,
-  refetchUser: () => {},
-});
+const PROTECTED = [
+  [Routes.DASHBOARD, Dashboard],
+  [Routes.NEW_TRIP, PlanTrip],
+  [Routes.MY_TRIPS, MyTrips],
+  [Routes.TRIP_DETAILS, TripDetails],
+  [Routes.ASSISTANT, Assistant],
+  [Routes.VISA_HELP, VisaHelp],
+  [Routes.LOCAL_SECRETS, LocalSecrets],
+  [Routes.TRAVEL_INFO, TravelInfo],
+  [Routes.TRAVEL_PACKAGE, TravelPackage],
+] as const;
 
-function Router() {
-  const [location] = useLocation();
-  const { data: user, isLoading, refetch: refetchUser } = useQuery<User | null | undefined>({
-    queryKey: [ApiEndpoints.USER],
-    queryFn: async () => {
-      try {
-        const res = await fetch(ApiEndpoints.USER, {
-          credentials: "include",
-        });
-        
-        if (res.status === 401) {
-          return null;
-        }
-        
-        if (!res.ok) {
-          throw new Error("Failed to fetch user");
-        }
-        
-        return await res.json();
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        return null;
-      }
-    },
-    retry: false,
-    staleTime: 10 * 1000, // 10 seconds
-    refetchInterval: 30 * 1000, // 30 seconds
-    refetchOnWindowFocus: true,
-  });
-
-  // Protected route component
-  const ProtectedRoute = ({ component: Component, ...rest }: { component: React.ComponentType<any>, [key: string]: any }) => {
-    const [, setLocation] = useLocation();
-    
-    // Add debug logging to better understand the values we're getting
-    console.log("[ProtectedRoute] User:", user);
-    console.log("[ProtectedRoute] isLoading:", isLoading);
-    console.log("[ProtectedRoute] Verification status:", user?.isVerified);
-    
-    // Redirect to login page if not authenticated and not loading
-    if (!isLoading && !user) {
-      console.log("[ProtectedRoute] Redirecting to login...");
-      setLocation(Routes.LOGIN);
-      return null;
-    }
-
-    // Show loading while checking auth
-    if (isLoading) {
-      return (
-        <div className="h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      );
-    }
-
-    // Check if user is verified
-    if (user && user.isVerified === false) {
-      console.log("[ProtectedRoute] User is not verified, redirecting to verification page");
-      setLocation(Routes.VERIFY_EMAIL);
-      return null;
-    }
-
-    // User is authenticated and verified, render the component
-    console.log("[ProtectedRoute] User is authenticated and verified, rendering component");
-    return <Component {...rest} />;
-  };
-
-  // Check if current route is landing page
-  const isLandingPage = location === Routes.HOME;
-
-  return (
-    <UserContext.Provider value={{ user, isLoading, refetchUser }}>
-      <Switch>
-        <Route path={Routes.HOME} component={LandingPage} />
-        <Route path={Routes.LOGIN} component={Login} />
-        <Route path={Routes.REGISTER} component={Register} />
-        <Route path={Routes.FORGOT_PASSWORD} component={ForgotPassword} />
-        <Route path={Routes.RESET_PASSWORD} component={ResetPassword} />
-        <Route path={Routes.VERIFY_EMAIL} component={VerifyEmail} />
-        <Route path={Routes.DASHBOARD}>
-          {(params) => <ProtectedRoute component={Dashboard} />}
-        </Route>
-        <Route path={Routes.MY_TRIPS}>
-          {(params) => <ProtectedRoute component={MyTrips} />}
-        </Route>
-        <Route path={Routes.LOCAL_SECRETS}>
-          {(params) => <ProtectedRoute component={LocalSecrets} />}
-        </Route>
-        <Route path={Routes.TRAVEL_INFO}>
-          {(params) => <ProtectedRoute component={TravelInfo} />}
-        </Route>
-        <Route path={Routes.VISA_HELP}>
-          {(params) => <ProtectedRoute component={VisaHelp} />}
-        </Route>
-        <Route path={Routes.TRAVEL_PACKAGE}>
-          {(params) => <ProtectedRoute component={TravelPackage} />}
-        </Route>
-        <Route path={`${Routes.TRIP_DETAILS}/:id`}>
-          {(params) => <ProtectedRoute component={TripDetails} id={params.id} />}
-        </Route>
-        <Route component={NotFound} />
-      </Switch>
-    </UserContext.Provider>
-  );
-}
-
-function App() {
+export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system">
         <AuthProvider>
-          <Router />
+          <Switch>
+            <Route path={Routes.HOME} component={Landing} />
+            <Route path={Routes.LOGIN} component={Login} />
+            <Route path={Routes.REGISTER} component={Register} />
+            <Route path={Routes.FORGOT_PASSWORD} component={ForgotPassword} />
+            <Route path={Routes.RESET_PASSWORD} component={ResetPassword} />
+            <Route path={Routes.VERIFY_EMAIL} component={VerifyEmail} />
+            {PROTECTED.map(([path, Page]) => (
+              <Route key={path} path={path}>
+                <ProtectedRoute component={Page} />
+              </Route>
+            ))}
+            <Route component={NotFound} />
+          </Switch>
           <Toaster />
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
 }
-
-export default App;

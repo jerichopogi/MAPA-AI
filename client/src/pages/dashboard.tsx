@@ -1,178 +1,100 @@
-import { useContext, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { UserContext } from "@/App";
-import { ApiEndpoints, Routes, DESTINATIONS } from "@/lib/constants";
-import { Trip } from "@/lib/types";
 import { Link } from "wouter";
-
-import Sidebar from "@/components/layout/sidebar";
-import MobileNav from "@/components/layout/mobile-nav";
-import TripCard from "@/components/trip-card";
-import TripGeneratorForm from "@/components/trip-generator-form";
-import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, Luggage, MapPinned, MessageCircle, Sparkles, Stamp } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
+import { TripCard, TripCardSkeleton } from "@/components/trips/trip-card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/use-auth";
+import { useTrips } from "@/hooks/use-trips";
+import { DESTINATIONS, Routes, countryImage } from "@/lib/constants";
 
-const Dashboard = () => {
-  const { user } = useContext(UserContext);
-  const [searchTerm, setSearchTerm] = useState("");
+const ACTIONS = [
+  { href: Routes.NEW_TRIP, icon: Sparkles, title: "Plan a trip", text: "Two AI itineraries in under a minute." },
+  { href: Routes.VISA_HELP, icon: Stamp, title: "Check visa rules", text: "Requirements for Philippine passports." },
+  { href: Routes.LOCAL_SECRETS, icon: MapPinned, title: "Local secrets", text: "Places locals love, by city." },
+  { href: Routes.ASSISTANT, icon: MessageCircle, title: "Ask the assistant", text: "Any travel question, answered." },
+];
 
-  // Fetch user trips
-  const { data: trips = [], isLoading: isLoadingTrips } = useQuery<Trip[]>({
-    queryKey: [ApiEndpoints.TRIPS],
-  });
+function greeting() {
+  const h = new Date().getHours();
+  return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+}
 
-  const recentTrips = trips.slice(0, 3); // Get only the 3 most recent trips
+export default function Dashboard() {
+  const { displayName } = useAuth();
+  const { data: trips, isLoading } = useTrips();
+  const recent = trips?.slice(0, 3) ?? [];
 
   return (
-    <div className="flex h-screen">
-      <Sidebar />
+    <div className="space-y-12">
+      <section>
+        <p className="text-sm text-muted-foreground">{greeting()},</p>
+        <h1 className="mt-1 text-3xl font-semibold">{displayName.split(" ")[0]} — where to next?</h1>
+      </section>
 
-      {/* Main Content */}
-      <div className="md:pl-64 flex flex-col flex-1">
-        {/* Top Navigation */}
-        <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white border-b border-neutral-200">
-          <div className="flex-1 px-4 flex justify-between">
-            <div className="flex-1 flex items-center">
-              {/* Mobile menu button */}
-              <button type="button" className="md:hidden px-4 text-neutral-500 focus:outline-none">
-                <i className="fas fa-bars"></i>
-              </button>
-              <div className="max-w-4xl w-full">
-                <label htmlFor="search" className="sr-only">Search</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                    <i className="fas fa-search text-neutral-400"></i>
-                  </div>
-                  <Input
-                    id="search"
-                    name="search"
-                    className="block w-full bg-neutral-50 border border-neutral-300 rounded-md py-2 pl-10 pr-3 text-sm placeholder-neutral-500 focus:outline-none focus:text-neutral-900 focus:bg-white focus:ring-1 focus:ring-primary focus:border-primary"
-                    placeholder="Search for destinations, experiences, or travel tips"
-                    type="search"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {ACTIONS.map(({ href, icon: Icon, title, text }) => (
+          <Link key={href} href={href} className="group rounded-xl border bg-card p-5 transition-colors hover:border-primary/40">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+              <Icon className="h-4 w-4" />
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <button type="button" className="p-1 rounded-full text-neutral-500 hover:text-neutral-600 mr-3">
-                <span className="sr-only">View notifications</span>
-                <i className="fas fa-bell"></i>
-              </button>
-              {/* Logout Button */}
-              <button 
-                type="button" 
-                className="flex items-center text-sm px-3 py-1.5 rounded-md border border-neutral-300 text-neutral-700 hover:bg-neutral-100"
-                onClick={async () => {
-                  try {
-                    await fetch('/api/logout', { method: 'POST' });
-                    window.location.href = Routes.HOME;
-                  } catch (error) {
-                    console.error('Logout failed:', error);
-                  }
-                }}
-              >
-                <i className="fas fa-sign-out-alt mr-2"></i>
-                Logout
-              </button>
-            </div>
-          </div>
+            <h2 className="mt-4 font-medium">{title}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{text}</p>
+          </Link>
+        ))}
+      </section>
+
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Recent trips</h2>
+          {recent.length > 0 && (
+            <Link href={Routes.MY_TRIPS} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+              View all <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
-
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto bg-neutral-50 p-4 md:p-6 pb-20 md:pb-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold font-sans text-neutral-800">Welcome, {user?.fullName || user?.username}!</h1>
-              <p className="text-neutral-600">Ready to plan your next adventure?</p>
-            </div>
-
-            {/* Trip Generator Card */}
-            <TripGeneratorForm />
-
-            {/* Recent Trips Section */}
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-neutral-800">Recent Trips</h2>
-                <Link href={Routes.MY_TRIPS}>
-                  <a className="text-primary text-sm hover:text-primary-dark">View all</a>
-                </Link>
-              </div>
-              
-              {isLoadingTrips ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[...Array(3)].map((_, i) => (
-                    <Card key={i} className="h-[280px] animate-pulse">
-                      <div className="h-40 bg-neutral-200"></div>
-                      <CardContent className="p-4">
-                        <div className="h-4 w-2/3 bg-neutral-200 rounded mb-3"></div>
-                        <div className="h-3 w-1/2 bg-neutral-100 rounded mb-3"></div>
-                        <div className="h-3 w-1/3 bg-neutral-100 rounded"></div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              ) : recentTrips.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {recentTrips.map((trip) => (
-                    <TripCard key={trip.id} trip={trip} />
-                  ))}
-                </div>
-              ) : (
-                <Card className="bg-white p-6 text-center">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
-                      <i className="fas fa-suitcase text-2xl"></i>
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2">No trips yet</h3>
-                    <p className="text-neutral-600 mb-6">Generate your first trip itinerary to get started!</p>
-                    <Link href="#trip-generator">
-                      <Button className="bg-primary text-white hover:bg-primary-dark">
-                        <i className="fas fa-plus mr-2"></i> Create Your First Trip
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              )}
-            </div>
-
-            {/* Travel Inspiration Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-neutral-800">Travel Inspiration</h2>
-                <a href="#inspiration" className="text-primary text-sm hover:text-primary-dark">View all</a>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {DESTINATIONS.slice(0, 3).map((destination, index) => (
-                  <div key={index} className="rounded-lg overflow-hidden shadow-md relative group">
-                    <img
-                      src={destination.image}
-                      alt={destination.name}
-                      className="w-full h-60 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 p-4 text-white">
-                      <h3 className="text-xl font-semibold mb-1">{destination.name}</h3>
-                      <p className="text-sm opacity-90">
-                        {destination.description.length > 50 
-                          ? `${destination.description.substring(0, 50)}...` 
-                          : destination.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {isLoading ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[0, 1, 2].map((i) => (
+              <TripCardSkeleton key={i} />
+            ))}
           </div>
-        </main>
+        ) : recent.length ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {recent.map((trip) => (
+              <TripCard key={trip.id} trip={trip} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            icon={Luggage}
+            title="No trips yet"
+            description="Generate your first itinerary — it takes less than a minute."
+            action={
+              <Button asChild>
+                <Link href={Routes.NEW_TRIP}>
+                  <Sparkles /> Plan a trip
+                </Link>
+              </Button>
+            }
+          />
+        )}
+      </section>
 
-        {/* Mobile Navigation */}
-        <MobileNav />
-      </div>
+      <section>
+        <h2 className="mb-4 text-lg font-semibold">Inspiration</h2>
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+          {DESTINATIONS.map((d) => (
+            <Link key={d.name} href={Routes.NEW_TRIP} className="group relative aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+              <img src={countryImage(d.country)} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+              <div className="absolute bottom-3 left-3 text-white">
+                <p className="font-medium">{d.name}</p>
+                <p className="text-xs text-white/80">{d.visa}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
-};
-
-export default Dashboard;
+}
