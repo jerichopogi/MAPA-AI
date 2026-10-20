@@ -1,0 +1,165 @@
+// Static reference data. It rarely changes, so it ships with the app
+// instead of living in the database.
+
+export interface Option {
+  code: string;
+  name: string;
+}
+
+export interface Preference extends Option {
+  icon: string; // lucide-react icon name, resolved in the client
+}
+
+export const AIRPORTS: Option[] = [
+  { code: "MNL", name: "Manila – Ninoy Aquino Intl" },
+  { code: "CEB", name: "Cebu – Mactan-Cebu Intl" },
+  { code: "CRK", name: "Clark Intl" },
+  { code: "DVO", name: "Davao – Francisco Bangoy Intl" },
+  { code: "ILO", name: "Iloilo Intl" },
+  { code: "BCD", name: "Bacolod-Silay Intl" },
+  { code: "KLO", name: "Kalibo Intl" },
+  { code: "TAG", name: "Bohol – Panglao Intl" },
+  { code: "PPS", name: "Puerto Princesa Intl" },
+  { code: "ZAM", name: "Zamboanga Intl" },
+  { code: "CGY", name: "Cagayan de Oro – Laguindingan" },
+  { code: "GES", name: "General Santos Intl" },
+];
+
+export const COUNTRIES: Option[] = [
+  { code: "JPN", name: "Japan" },
+  { code: "KOR", name: "South Korea" },
+  { code: "SGP", name: "Singapore" },
+  { code: "THA", name: "Thailand" },
+  { code: "VNM", name: "Vietnam" },
+  { code: "MYS", name: "Malaysia" },
+  { code: "IDN", name: "Indonesia" },
+  { code: "HKG", name: "Hong Kong" },
+  { code: "TWN", name: "Taiwan" },
+  { code: "AUS", name: "Australia" },
+  { code: "USA", name: "United States" },
+  { code: "CAN", name: "Canada" },
+  { code: "GBR", name: "United Kingdom" },
+  { code: "FRA", name: "France" },
+  { code: "ITA", name: "Italy" },
+  { code: "ESP", name: "Spain" },
+];
+
+export const CURRENCIES: Option[] = [
+  { code: "PHP", name: "Philippine Peso" },
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "JPY", name: "Japanese Yen" },
+  { code: "SGD", name: "Singapore Dollar" },
+  { code: "KRW", name: "Korean Won" },
+  { code: "THB", name: "Thai Baht" },
+];
+
+export const PREFERENCES: Preference[] = [
+  { code: "landmarks", name: "Landmarks", icon: "Landmark" },
+  { code: "food", name: "Food", icon: "UtensilsCrossed" },
+  { code: "shopping", name: "Shopping", icon: "ShoppingBag" },
+  { code: "adventure", name: "Adventure", icon: "Mountain" },
+  { code: "culture", name: "Culture", icon: "Drama" },
+  { code: "photo", name: "Photo spots", icon: "Camera" },
+  { code: "nature", name: "Nature", icon: "Leaf" },
+  { code: "nightlife", name: "Nightlife", icon: "Moon" },
+];
+
+export const CITIES_BY_COUNTRY: Record<string, Option[]> = {
+  JPN: [
+    { code: "TYO", name: "Tokyo" },
+    { code: "OSA", name: "Osaka" },
+    { code: "KYO", name: "Kyoto" },
+    { code: "HIJ", name: "Hiroshima" },
+    { code: "SPK", name: "Sapporo" },
+    { code: "FUK", name: "Fukuoka" },
+    { code: "OKA", name: "Okinawa" },
+  ],
+  KOR: [
+    { code: "SEL", name: "Seoul" },
+    { code: "PUS", name: "Busan" },
+    { code: "CJU", name: "Jeju" },
+    { code: "ICN", name: "Incheon" },
+  ],
+  SGP: [{ code: "SIN", name: "Singapore" }],
+  THA: [
+    { code: "BKK", name: "Bangkok" },
+    { code: "CNX", name: "Chiang Mai" },
+    { code: "HKT", name: "Phuket" },
+    { code: "KBV", name: "Krabi" },
+  ],
+  VNM: [
+    { code: "HAN", name: "Hanoi" },
+    { code: "SGN", name: "Ho Chi Minh City" },
+    { code: "DAD", name: "Da Nang" },
+    { code: "HOI", name: "Hoi An" },
+  ],
+  MYS: [
+    { code: "KUL", name: "Kuala Lumpur" },
+    { code: "PEN", name: "Penang" },
+    { code: "BKI", name: "Kota Kinabalu" },
+  ],
+  IDN: [
+    { code: "DPS", name: "Bali" },
+    { code: "JKT", name: "Jakarta" },
+    { code: "JOG", name: "Yogyakarta" },
+  ],
+  HKG: [{ code: "HKG", name: "Hong Kong" }],
+  TWN: [
+    { code: "TPE", name: "Taipei" },
+    { code: "KHH", name: "Kaohsiung" },
+    { code: "RMQ", name: "Taichung" },
+    { code: "TNN", name: "Tainan" },
+  ],
+  AUS: [
+    { code: "SYD", name: "Sydney" },
+    { code: "MEL", name: "Melbourne" },
+    { code: "BNE", name: "Brisbane" },
+    { code: "PER", name: "Perth" },
+  ],
+  USA: [
+    { code: "NYC", name: "New York" },
+    { code: "LAX", name: "Los Angeles" },
+    { code: "SFO", name: "San Francisco" },
+    { code: "LAS", name: "Las Vegas" },
+    { code: "HNL", name: "Honolulu" },
+  ],
+  CAN: [
+    { code: "YVR", name: "Vancouver" },
+    { code: "YYZ", name: "Toronto" },
+  ],
+  GBR: [
+    { code: "LON", name: "London" },
+    { code: "EDI", name: "Edinburgh" },
+  ],
+  FRA: [
+    { code: "PAR", name: "Paris" },
+    { code: "NCE", name: "Nice" },
+  ],
+  ITA: [
+    { code: "ROM", name: "Rome" },
+    { code: "FLR", name: "Florence" },
+    { code: "VCE", name: "Venice" },
+  ],
+  ESP: [
+    { code: "MAD", name: "Madrid" },
+    { code: "BCN", name: "Barcelona" },
+  ],
+};
+
+export const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December",
+];
+
+const byCode = (list: Option[]) => new Map(list.map((o) => [o.code, o.name]));
+const airportNames = byCode(AIRPORTS);
+const countryNames = byCode(COUNTRIES);
+const preferenceNames = byCode(PREFERENCES);
+
+export const airportName = (code: string) => airportNames.get(code) ?? code;
+export const countryName = (code: string) => countryNames.get(code) ?? code;
+export const preferenceName = (code: string) => preferenceNames.get(code) ?? code;
+export const cityName = (country: string, code: string) =>
+  CITIES_BY_COUNTRY[country]?.find((c) => c.code === code)?.name ?? code;
+export const monthName = (month: number) => MONTHS[month - 1] ?? "";
