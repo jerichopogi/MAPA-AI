@@ -84,7 +84,7 @@ export default function Billing() {
                 <div>
                   <p className="font-medium">{PRODUCTS[p.product]?.name ?? p.product}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDate(p.created_at)} · {p.provider === "mock" ? "Test checkout" : "PayMongo"}
+                    {formatDate(p.created_at)} · {p.provider === "mock" ? "Test checkout" : p.provider === "paypal" ? "PayPal" : "PayMongo"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">

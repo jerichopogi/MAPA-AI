@@ -22,7 +22,7 @@ export default function BillingSuccess() {
     started.current = true;
 
     (async () => {
-      // PayMongo can take a few seconds to mark the session paid.
+      // Payment providers can take a few seconds to settle.
       for (let attempt = 0; attempt < 6; attempt++) {
         try {
           const res = await billingApi.confirm(paymentId);

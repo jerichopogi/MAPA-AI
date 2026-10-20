@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useSearch } from "wouter";
-import { CreditCard, FlaskConical, Loader2, Smartphone, Wallet } from "lucide-react";
+import { CreditCard, FlaskConical, Loader2, Wallet } from "lucide-react";
 import { PRODUCTS, pesos, type ProductId } from "@shared/plans";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -11,20 +11,19 @@ import { requireSupabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
 const METHODS = [
-  { id: "gcash", label: "GCash", icon: Smartphone },
-  { id: "maya", label: "Maya", icon: Wallet },
+  { id: "paypal", label: "PayPal", icon: Wallet },
   { id: "card", label: "Card", icon: CreditCard },
 ];
 
 /**
- * Local stand-in for PayMongo's hosted checkout, used in development when no
- * PAYMONGO_SECRET_KEY is set. The server refuses these payments in production.
+ * Local stand-in for the PayPal checkout, used in development when no payment
+ * provider credentials are set. The server refuses these payments in production.
  */
 export default function TestCheckout() {
   const paymentId = new URLSearchParams(useSearch()).get("payment") ?? "";
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const [method, setMethod] = useState("gcash");
+  const [method, setMethod] = useState("paypal");
   const [busy, setBusy] = useState<"paid" | "failed" | null>(null);
 
   const { data: payment, isLoading } = useQuery({
@@ -53,7 +52,7 @@ export default function TestCheckout() {
   return (
     <div className="mx-auto max-w-md py-8">
       <div className="mb-6 flex items-center gap-2 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">
-        <FlaskConical className="h-4 w-4 shrink-0" /> Test checkout — no real money moves. Add a PayMongo key to use real checkout.
+        <FlaskConical className="h-4 w-4 shrink-0" /> Test checkout — no real money moves. Add PayPal sandbox credentials to use PayPal.
       </div>
       <div className="card-soft p-6">
         <p className="text-sm text-muted-foreground">MAPA AI</p>
@@ -63,7 +62,7 @@ export default function TestCheckout() {
         </div>
 
         <p className="mt-6 text-sm font-medium">Payment method</p>
-        <div className="mt-2 grid grid-cols-3 gap-2">
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {METHODS.map(({ id, label, icon: Icon }) => (
             <button
               key={id}

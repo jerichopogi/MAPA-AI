@@ -68,22 +68,25 @@ GEMINI_API_KEY=<key from https://aistudio.google.com/apikey>
 ## 3. Payments: Free and Plus plans (optional)
 
 Free users get 3 AI itineraries plus 20 other AI answers a month. **Plus** is a
-one-time pass (₱149 for 30 days, ₱1,290 for a year) paid through
-[PayMongo](https://paymongo.com) with GCash, Maya or card. Plans and prices
-live in [`shared/plans.ts`](shared/plans.ts).
+one-time pass (₱149 for 30 days, ₱1,290 for a year) paid with **PayPal**
+(PayPal balance or any Visa/Mastercard, charged in PHP). Plans and prices live in
+[`shared/plans.ts`](shared/plans.ts).
 
-1. Apply [`supabase/migrations/20261020120000_billing.sql`](supabase/migrations/20261020120000_billing.sql).
+1. Apply the billing migrations in [`supabase/migrations/`](supabase/migrations).
 2. Add `SUPABASE_SERVICE_ROLE_KEY` to `.env` (Supabase → Project Settings → API).
    It is server-only and is what activates plans; usage limits switch on with it.
-3. **Test without PayMongo:** leave `PAYMONGO_SECRET_KEY` empty. In development,
+3. **Test without PayPal:** leave the PayPal settings empty. In development,
    "Get Plus" opens a built-in **test checkout** where you can simulate a paid or
    failed payment. It is disabled in production.
-4. **Test with PayMongo:** set `PAYMONGO_SECRET_KEY=sk_test_…`. Checkout redirects
-   to PayMongo's hosted page, where test payments are approved without real money.
-   Locally, the success page confirms the payment with PayMongo directly.
-5. **Production:** use your live key, set `APP_URL`, and add a webhook in
-   PayMongo → Developers → Webhooks pointing to `https://<your-domain>/api/billing/webhook`
-   with the event `checkout_session.payment.paid`. Put its secret in `PAYMONGO_WEBHOOK_SECRET`.
+4. **Test with PayPal Sandbox:** at [developer.paypal.com](https://developer.paypal.com)
+   → *Apps & Credentials* → **Sandbox**, open the *Default Application* and copy the
+   **Client ID** and **Secret** into `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET`
+   (`PAYPAL_ENV=sandbox`). Under *Testing Tools → Sandbox Accounts* you'll find a
+   **Personal** test buyer — log in with it on the PayPal page. No real money moves.
+5. **Go live:** create a *Live* app, use its credentials with `PAYPAL_ENV=live`, and
+   set `APP_URL`. The pass is activated when PayPal returns the buyer to
+   `/billing/success`, where the server captures the payment; a buyer who
+   approves but never returns is never charged.
 
 ## 4. Affiliate commissions (optional)
 
@@ -124,9 +127,9 @@ A commission disclosure is shown under every set of suggestions.
 | `GEMINI_MODEL` | no (default `gemini-3.5-flash-lite`) | server |
 | `GEMINI_FALLBACK_MODEL` | no (default `gemini-flash-lite-latest`) | server |
 | `SUPABASE_SERVICE_ROLE_KEY` | for plans & limits | server only |
-| `PAYMONGO_SECRET_KEY` | for real checkout | server only |
-| `PAYMONGO_WEBHOOK_SECRET` | production | server only |
-| `PAYMONGO_METHODS` | no (default `gcash,paymaya,card`) | server |
+| `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` | for real checkout | server only |
+| `PAYPAL_ENV` | no (default `sandbox`) | server |
+| `PAYMONGO_SECRET_KEY` | alternative to PayPal | server only |
 | `APP_URL` | production | server |
 | `PORT` | no (default `5000`) | server |
 

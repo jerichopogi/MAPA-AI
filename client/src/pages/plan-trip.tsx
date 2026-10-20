@@ -3,13 +3,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Link, useLocation, useSearch } from "wouter";
-import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
+import { ArrowDown, ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
 import { generateTripSchema, type AiResult, type GenerateTripInput, type GeneratedTrip } from "@shared/schema";
-import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MONTHS, PREFERENCES } from "@shared/reference-data";
+import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MAIN_AIRPORT, MONTHS, PREFERENCES, cityName, countryName } from "@shared/reference-data";
 import { AiSourceBadge } from "@/components/ai-source-badge";
 import { PageHeader } from "@/components/layout/app-shell";
 import { PreferenceIcon } from "@/components/preference-icon";
-import { BookingSuggestions } from "@/components/trips/booking-suggestions";
+import { BookThisTrip } from "@/components/trips/booking-suggestions";
 import { ItineraryView } from "@/components/trips/itinerary-view";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -130,6 +130,11 @@ export default function PlanTrip() {
           description="Two plans for the same trip — compare them and save the one you like."
           actions={
             <>
+              <Button variant="outline" asChild>
+                <a href="#book">
+                  <ArrowDown /> Book this trip
+                </a>
+              </Button>
               <Button variant="outline" onClick={() => generate.mutate(input)} disabled={generate.isPending}>
                 {generate.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />} Regenerate
               </Button>
@@ -146,12 +151,14 @@ export default function PlanTrip() {
           currency={input.currency}
           budget={input.budget}
         />
-        {response.data.bookings && (
-          <section className="mt-12">
-            <h2 className="mb-4 text-lg font-medium">Book this trip</h2>
-            <BookingSuggestions bookings={response.data.bookings} currency={input.currency} />
-          </section>
-        )}
+        <BookThisTrip
+          className="mt-12"
+          bookings={response.data.bookings}
+          currency={input.currency}
+          origin={input.originAirport}
+          destinationAirport={MAIN_AIRPORT[input.destinationCountry] ?? ""}
+          where={input.selectedCities?.length ? cityName(input.destinationCountry, input.selectedCities[0]) : countryName(input.destinationCountry)}
+        />
       </>
     );
   }

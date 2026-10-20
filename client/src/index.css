@@ -27,6 +27,8 @@
     --brand: 194 50% 21%;
     --brand-foreground: 0 0% 100%;
     --radius: 1rem;
+    /* Native controls (date picker, scrollbars) follow the theme. */
+    color-scheme: light;
   }
 
   .dark {
@@ -51,6 +53,7 @@
     --ring: 189 42% 62%;
     --brand: 194 45% 17%;
     --brand-foreground: 0 0% 98%;
+    color-scheme: dark;
   }
 
   * {

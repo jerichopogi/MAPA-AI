@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { CalendarDays, CloudSun, Compass, Loader2, PartyPopper, Stamp } from "lucide-react";
+import { CalendarDays, CloudSun, Compass, Loader2, PartyPopper, Search, Stamp } from "lucide-react";
 import { AiSourceBadge } from "@/components/ai-source-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +46,18 @@ export function DestinationIdeas() {
       <form onSubmit={submit} className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-[1.2fr_0.7fr_1fr_auto] sm:items-end">
         <label className="col-span-2 space-y-1.5 text-sm sm:col-span-1">
           <span className="text-muted-foreground">Leaving on</span>
-          <Input type="date" value={date} min={isoDate(new Date())} onChange={(e) => setDate(e.target.value)} required />
+          <div className="relative">
+            <CalendarDays className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            {/* The native picker icon is stretched invisibly over the field, so a click anywhere opens the calendar. */}
+            <Input
+              type="date"
+              value={date}
+              min={isoDate(new Date())}
+              onChange={(e) => setDate(e.target.value)}
+              required
+              className="relative cursor-pointer pl-9 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0"
+            />
+          </div>
         </label>
         <label className="space-y-1.5 text-sm">
           <span className="text-muted-foreground">Days</span>
@@ -57,7 +68,7 @@ export function DestinationIdeas() {
           <Input type="number" min={1000} value={budget} onChange={(e) => setBudget(e.target.valueAsNumber || 0)} />
         </label>
         <Button type="submit" className="col-span-2 sm:col-span-1" disabled={ideas.isPending || !date}>
-          {ideas.isPending ? <Loader2 className="animate-spin" /> : <CalendarDays />} Find places
+          {ideas.isPending ? <Loader2 className="animate-spin" /> : <Search />} Find places
         </Button>
       </form>
 

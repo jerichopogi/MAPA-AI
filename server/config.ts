@@ -17,6 +17,12 @@ export const config = {
     // Server-only. Needed to activate plans and record AI usage.
     serviceRoleKey: env.SUPABASE_SERVICE_ROLE_KEY || "",
   },
+  paypal: {
+    clientId: env.PAYPAL_CLIENT_ID || "",
+    clientSecret: env.PAYPAL_CLIENT_SECRET || "",
+    /** "sandbox" (test money) or "live". */
+    env: env.PAYPAL_ENV === "live" ? "live" : "sandbox",
+  },
   paymongo: {
     secretKey: env.PAYMONGO_SECRET_KEY || "",
     webhookSecret: env.PAYMONGO_WEBHOOK_SECRET || "",
@@ -38,11 +44,16 @@ export const isSupabaseConfigured = Boolean(config.supabase.url && config.supaba
 export const isGeminiConfigured = Boolean(config.gemini.apiKey);
 export const isBillingConfigured = isSupabaseConfigured && Boolean(config.supabase.serviceRoleKey);
 
-/** Real PayMongo when a key is set; otherwise a local test checkout, but never in production. */
-export const paymentProvider: "paymongo" | "mock" | null = !isBillingConfigured
+/**
+ * Checkout provider: PayPal when its credentials are set, else PayMongo, else a
+ * local test checkout in development. Never the test checkout in production.
+ */
+export const paymentProvider: "paypal" | "paymongo" | "mock" | null = !isBillingConfigured
   ? null
-  : config.paymongo.secretKey
-    ? "paymongo"
-    : config.isProd
-      ? null
-      : "mock";
+  : config.paypal.clientId && config.paypal.clientSecret
+    ? "paypal"
+    : config.paymongo.secretKey
+      ? "paymongo"
+      : config.isProd
+        ? null
+        : "mock";

@@ -20,7 +20,7 @@ export interface PaymentRow {
   id: string;
   product: ProductId;
   amount: number;
-  provider: "paymongo" | "mock";
+  provider: "paypal" | "paymongo" | "mock";
   status: "pending" | "paid" | "failed";
   paid_at: string | null;
   created_at: string;

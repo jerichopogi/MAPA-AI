@@ -5,6 +5,7 @@ import { config, paymentProvider } from "../config";
 import { requireAuth, type AuthedRequest } from "../middleware/auth";
 import { supabaseAdmin } from "../supabase-admin";
 import * as paymongo from "./paymongo";
+import * as paypal from "./paypal";
 import { getBillingStatus } from "./usage";
 
 export const billing = Router();
@@ -14,7 +15,7 @@ const appOrigin = (req: Request) => config.appUrl || `${req.protocol}://${req.ge
 
 function requireBilling(_req: Request, res: Response, next: () => void) {
   if (!supabaseAdmin || !paymentProvider) {
-    return res.status(503).json({ message: "Payments aren't set up yet. Add SUPABASE_SERVICE_ROLE_KEY (and PAYMONGO_SECRET_KEY) to .env." });
+    return res.status(503).json({ message: "Payments aren't set up yet. Add SUPABASE_SERVICE_ROLE_KEY (and PayPal credentials) to .env." });
   }
   next();
 }
@@ -22,7 +23,7 @@ function requireBilling(_req: Request, res: Response, next: () => void) {
 async function findPayment(id: string) {
   const { data, error } = await supabaseAdmin!.from("payments").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
-  return data as { id: string; user_id: string; provider: string; checkout_session_id: string | null; status: string } | null;
+  return data as { id: string; user_id: string; provider: string; product: string; amount: number; checkout_session_id: string | null; status: string } | null;
 }
 
 async function activate(paymentId: string) {
@@ -60,6 +61,18 @@ billing.post("/checkout", requireAuth, requireBilling, async (req, res) => {
       return res.json({ url: `${origin}/checkout/test?payment=${payment.id}` });
     }
 
+    if (paymentProvider === "paypal") {
+      const order = await paypal.createOrder({
+        paymentId: payment.id,
+        name: product.name,
+        amount: product.amount,
+        returnUrl: `${origin}/billing/success?payment=${payment.id}`,
+        cancelUrl: `${origin}/pricing?canceled=1`,
+      });
+      await supabaseAdmin!.from("payments").update({ checkout_session_id: order.id }).eq("id", payment.id);
+      return res.json({ url: order.url });
+    }
+
     const session = await paymongo.createCheckoutSession({
       paymentId: payment.id,
       name: product.name,
@@ -77,8 +90,8 @@ billing.post("/checkout", requireAuth, requireBilling, async (req, res) => {
 });
 
 /**
- * Called by the success page. Asks PayMongo whether the session was paid and
- * activates the pass if so — this works locally where webhooks can't reach us.
+ * Called by the success page. Captures the PayPal order (or asks PayMongo whether
+ * the session was paid) and activates the pass — works locally without webhooks.
  */
 billing.post("/confirm", requireAuth, requireBilling, async (req, res) => {
   const paymentId = z.string().uuid().safeParse(req.body?.paymentId);
@@ -88,8 +101,16 @@ billing.post("/confirm", requireAuth, requireBilling, async (req, res) => {
     const payment = await findPayment(paymentId.data);
     if (!payment || payment.user_id !== userOf(req).id) return res.status(404).json({ message: "Payment not found." });
 
-    if (payment.status === "pending" && payment.provider === "paymongo" && payment.checkout_session_id) {
-      if (await paymongo.isCheckoutPaid(payment.checkout_session_id)) await activate(payment.id);
+    if (payment.status === "pending" && payment.checkout_session_id) {
+      if (payment.provider === "paymongo" && (await paymongo.isCheckoutPaid(payment.checkout_session_id))) {
+        await activate(payment.id);
+      }
+      if (payment.provider === "paypal") {
+        // The buyer approved on PayPal; capturing here is what actually charges them.
+        const result = await paypal.captureOrder(payment.checkout_session_id, { paymentId: payment.id, amount: payment.amount });
+        if (result === "paid") await activate(payment.id);
+        if (result === "failed") await supabaseAdmin!.from("payments").update({ status: "failed" }).eq("id", payment.id).eq("status", "pending");
+      }
     }
 
     const updated = await findPayment(payment.id);

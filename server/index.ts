@@ -44,10 +44,12 @@ server.listen(config.port, () => {
   if (!isSupabaseConfigured) log("Supabase not configured — sign-in is disabled. See README.md.", "setup");
   log(isGeminiConfigured ? "AI: Gemini" : "AI: mock data (set GEMINI_API_KEY for live answers)", "setup");
   log(
-    paymentProvider === "paymongo"
+    paymentProvider === "paypal"
+      ? `Payments: PayPal (${config.paypal.env} mode)`
+      : paymentProvider === "paymongo"
       ? `Payments: PayMongo (${config.paymongo.secretKey.startsWith("sk_live") ? "LIVE" : "test"} mode)`
       : paymentProvider === "mock"
-        ? "Payments: local test checkout (set PAYMONGO_SECRET_KEY for PayMongo)"
+        ? "Payments: local test checkout (set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET for PayPal)"
         : "Payments: off (set SUPABASE_SERVICE_ROLE_KEY to enable plans)",
     "setup",
   );

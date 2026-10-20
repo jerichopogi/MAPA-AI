@@ -81,7 +81,7 @@ export function PricingCards() {
 export function PaymentMethodsNote() {
   return (
     <p className="mt-6 text-center text-xs text-muted-foreground">
-      Secure checkout by PayMongo · GCash · Maya · Visa / Mastercard · One-time payment, no auto-renew
+      Secure checkout by PayPal · PayPal balance or Visa / Mastercard · One-time payment, no auto-renew
     </p>
   );
 }

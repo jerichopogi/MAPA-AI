@@ -62,12 +62,12 @@ parse reliably without the regex repair the old code needed.
 (`quota_exceeded`), which opens the upgrade dialog in the client; each
 successful call writes an `ai_usage` row.
 
-Checkout (`server/billing/`) creates a `payments` row, then a PayMongo Checkout
-Session (or the dev-only test checkout). A pass is activated by the
+Checkout (`server/billing/`) creates a `payments` row, then a PayPal order
+(or a PayMongo Checkout Session, or the dev-only test checkout). A pass is activated by the
 `activate_payment()` SQL function, which is idempotent and callable only with
-the service-role key. It is triggered by the PayMongo webhook in production,
-and by `/api/billing/confirm` on the success page, which works locally where
-webhooks can't reach. Users can read, but never write, `subscriptions`,
+the service-role key. For PayPal it is triggered by
+`/api/billing/confirm` on the success page, which captures the approved order
+(checking amount and currency) before activating; for PayMongo also by its webhook. Users can read, but never write, `subscriptions`,
 `payments` and `ai_usage`.
 
 ## Data model

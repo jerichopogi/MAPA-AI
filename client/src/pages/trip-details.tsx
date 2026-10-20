@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
-import { ArrowLeft, ExternalLink, Hotel, Loader2, Plane, Printer, Ticket, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowLeft, Loader2, Plane, Printer, Trash2 } from "lucide-react";
 import { MAIN_AIRPORT } from "@shared/reference-data";
 import { airportName, cityName, countryName, monthName, preferenceName } from "@shared/reference-data";
 import { EmptyState } from "@/components/empty-state";
-import { BookingSuggestions } from "@/components/trips/booking-suggestions";
+import { BookThisTrip } from "@/components/trips/booking-suggestions";
 import { ItineraryView } from "@/components/trips/itinerary-view";
-import { partnerLink } from "@/lib/affiliates";
 import { TripStatusBadge } from "@/components/trips/trip-status-badge";
 import {
   AlertDialog,
@@ -28,15 +27,9 @@ import { Routes, countryImage } from "@/lib/constants";
 import type { Trip, TripStatus } from "@/lib/types";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-function bookingLinks(trip: Trip) {
-  const where = trip.selectedCities.length ? cityName(trip.destinationCountry, trip.selectedCities[0]) : countryName(trip.destinationCountry);
-  return [
-    { icon: Plane, label: "Flights", href: partnerLink("googleflights", { from: trip.originAirport, to: MAIN_AIRPORT[trip.destinationCountry] ?? where }) },
-    { icon: Hotel, label: "Stays on Agoda", href: partnerLink("agoda", { query: where }) },
-    { icon: Hotel, label: "Stays on Booking.com", href: partnerLink("booking", { query: where }) },
-    { icon: Ticket, label: "Activities on Klook", href: partnerLink("klook", { query: where }) },
-  ];
-}
+/** Display name of where the trip goes: first selected city, else the country. */
+const tripWhere = (trip: Trip) =>
+  trip.selectedCities.length ? cityName(trip.destinationCountry, trip.selectedCities[0]) : countryName(trip.destinationCountry);
 
 function Notes({ trip }: { trip: Trip }) {
   const [notes, setNotes] = useState(trip.notes);
@@ -151,6 +144,11 @@ export default function TripDetails() {
             <SelectItem value="cancelled">Cancelled</SelectItem>
           </SelectContent>
         </Select>
+        <Button asChild>
+          <a href="#book">
+            <ArrowDown /> Book this trip
+          </a>
+        </Button>
         <Button variant="outline" onClick={() => window.print()}>
           <Printer /> Print / PDF
         </Button>
@@ -207,29 +205,16 @@ export default function TripDetails() {
         </section>
       ) : null}
 
-      {trip.bookingSuggestions && (
-        <section className="no-print">
-          <h2 className="mb-4 text-lg font-semibold">Book this trip</h2>
-          <BookingSuggestions bookings={trip.bookingSuggestions} currency={trip.currency} />
-        </section>
-      )}
+      <BookThisTrip
+        bookings={trip.bookingSuggestions}
+        currency={trip.currency}
+        origin={trip.originAirport}
+        destinationAirport={MAIN_AIRPORT[trip.destinationCountry] ?? ""}
+        where={tripWhere(trip)}
+      />
 
-      <section className="grid gap-4 lg:grid-cols-[1fr_18rem] no-print">
+      <section className="no-print">
         <Notes trip={trip} />
-        <div className="rounded-xl border bg-card p-5">
-          <h2 className="font-medium">Book it</h2>
-          <ul className="mt-3 space-y-1">
-            {bookingLinks(trip).map(({ icon: Icon, label, href }) => (
-              <li key={label}>
-                <a href={href} target="_blank" rel="sponsored noopener noreferrer" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-muted">
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  <span className="flex-1">{label}</span>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
       </section>
     </div>
   );

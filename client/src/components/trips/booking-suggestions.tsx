@@ -38,7 +38,7 @@ function Item({ title, meta, price, why, children }: { title: string; meta: stri
           <p className="font-medium leading-snug">{title}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">{meta}</p>
         </div>
-        <p className="shrink-0 text-sm font-medium tabular-nums">{price}</p>
+        {price && <p className="shrink-0 text-sm font-medium tabular-nums">{price}</p>}
       </div>
       <p className="mt-2 text-sm text-muted-foreground">{why}</p>
       <div className="mt-auto flex flex-wrap gap-2 pt-4">{children}</div>
@@ -94,5 +94,62 @@ export function BookingSuggestions({ bookings, currency }: { bookings: Suggestio
         links, at no extra cost to you.
       </p>
     </div>
+  );
+}
+
+/** Destination-wide partner links, for trips saved without AI suggestions. */
+function QuickBookingLinks({ origin, destinationAirport, where }: { origin: string; destinationAirport: string; where: string }) {
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Item title="Flights" meta={`${origin} → ${destinationAirport || where}`} price="" why="Compare fares, then book direct with the airline.">
+          <PartnerButton partner="cebupacific" vars={{ from: origin, to: destinationAirport }} primary />
+          <PartnerButton partner="airasia" vars={{ from: origin, to: destinationAirport }} />
+          <PartnerButton partner="googleflights" vars={{ from: origin, to: destinationAirport }} />
+        </Item>
+        <Item title="Where to stay" meta={where} price="" why="Hotels, hostels and apartments with free cancellation options.">
+          <PartnerButton partner="agoda" vars={{ query: where }} primary />
+          <PartnerButton partner="booking" vars={{ query: where }} />
+        </Item>
+        <Item title="Tours & activities" meta={where} price="" why="Attraction tickets, day tours, rail passes and airport transfers.">
+          <PartnerButton partner="klook" vars={{ query: where }} primary />
+        </Item>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        MAPA AI may earn a commission when you book through these links, at no extra cost to you.
+      </p>
+    </div>
+  );
+}
+
+/** The "Book this trip" section: AI suggestions when available, otherwise destination-wide links. */
+export function BookThisTrip({
+  bookings,
+  currency,
+  origin,
+  destinationAirport,
+  where,
+  className,
+}: {
+  bookings: Suggestions | null | undefined;
+  currency: string;
+  origin: string;
+  destinationAirport: string;
+  where: string;
+  className?: string;
+}) {
+  const hasSuggestions = bookings && (bookings.flights.length || bookings.stays.length || bookings.activities.length);
+  return (
+    <section id="book" className={cn("scroll-mt-8 no-print", className)}>
+      <h2 className="text-lg font-medium">Book this trip</h2>
+      <p className="mb-5 mt-1 text-sm text-muted-foreground">
+        {hasSuggestions ? "Hand-picked by the AI for this itinerary." : `Find flights, stays and tours for ${where}.`}
+      </p>
+      {hasSuggestions ? (
+        <BookingSuggestions bookings={bookings} currency={currency} />
+      ) : (
+        <QuickBookingLinks origin={origin} destinationAirport={destinationAirport} where={where} />
+      )}
+    </section>
   );
 }

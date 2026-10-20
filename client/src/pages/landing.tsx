@@ -341,7 +341,7 @@ export default function Landing() {
 
       {/* Pricing */}
       <section id="pricing" className="container-page scroll-mt-8 pb-28">
-        <SectionIntro label="Pricing" title="Start Free, Upgrade Anytime" text="Pay once with GCash, Maya or card. No subscriptions, no surprise charges." />
+        <SectionIntro label="Pricing" title="Start Free, Upgrade Anytime" text="Pay once with PayPal or card. No subscriptions, no surprise charges." />
         <div className="mt-12">
           <PricingCards />
           <PaymentMethodsNote />

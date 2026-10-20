@@ -32,7 +32,7 @@ export const FREE_FEATURES = [
 export const PLUS_FEATURES = [
   "Unlimited AI itineraries",
   "Unlimited visa help, local secrets & assistant",
-  "Pay with GCash, Maya or card",
+  "Pay securely with PayPal or card",
   "Supports an independent Filipino project",
 ];
 
@@ -49,7 +49,7 @@ export interface BillingStatus {
   usage: UsageSummary;
   limits: typeof FREE_LIMITS;
   /** Which checkout the server will use: real PayMongo, the local test checkout, or none. */
-  provider: "paymongo" | "mock" | null;
+  provider: "paypal" | "paymongo" | "mock" | null;
 }
 
 export const pesos = (centavos: number) =>

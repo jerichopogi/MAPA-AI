@@ -28,7 +28,20 @@ async function run<T>(live: () => Promise<T>, fallback: () => T): Promise<AiResu
 }
 
 export const generateTrip = (input: GenerateTripInput) =>
-  run<GeneratedTrip>(() => gemini.generateJson(tripPrompt(input)), () => mock.mockTrip(input));
+  run<GeneratedTrip>(
+    async () => {
+      const trip = await gemini.generateJson<GeneratedTrip>(tripPrompt(input));
+      // The model occasionally drops a list; normalise so the UI can rely on arrays.
+      const b = trip.bookings;
+      trip.bookings = {
+        flights: Array.isArray(b?.flights) ? b.flights : [],
+        stays: Array.isArray(b?.stays) ? b.stays : [],
+        activities: Array.isArray(b?.activities) ? b.activities : [],
+      };
+      return trip;
+    },
+    () => mock.mockTrip(input),
+  );
 
 export const visaRequirements = (input: VisaQueryInput) =>
   run<VisaRequirement>(() => gemini.generateJson(visaPrompt(input)), () => mock.mockVisa(input));
