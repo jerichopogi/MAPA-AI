@@ -18,7 +18,10 @@ export const config = {
   gemini: {
     // GOOGLE_GEMINI_API_KEY is accepted for backwards compatibility.
     apiKey: env.GEMINI_API_KEY || env.GOOGLE_GEMINI_API_KEY || "",
-    model: env.GEMINI_MODEL || "gemini-2.5-flash",
+    // Flash-Lite answers in seconds; full Flash models can take minutes per itinerary.
+    model: env.GEMINI_MODEL || "gemini-3.5-flash-lite",
+    // Tried once when the primary model is overloaded or retired.
+    fallbackModel: env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest",
   },
 };
 

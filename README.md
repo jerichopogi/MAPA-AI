@@ -61,7 +61,8 @@ with a badge in the UI). To use Gemini:
 
 ```
 GEMINI_API_KEY=<key from https://aistudio.google.com/apikey>
-# GEMINI_MODEL=gemini-2.5-flash
+# GEMINI_MODEL=gemini-3.5-flash-lite        # fast; full Flash models are slower but richer
+# GEMINI_FALLBACK_MODEL=gemini-flash-lite-latest  # used when the main model is busy
 ```
 
 ## Scripts
@@ -81,7 +82,8 @@ GEMINI_API_KEY=<key from https://aistudio.google.com/apikey>
 | `VITE_SUPABASE_URL` | for sign-in | client + server (token checks) |
 | `VITE_SUPABASE_ANON_KEY` | for sign-in | client + server |
 | `GEMINI_API_KEY` | no (mock data without it) | server |
-| `GEMINI_MODEL` | no (default `gemini-2.5-flash`) | server |
+| `GEMINI_MODEL` | no (default `gemini-3.5-flash-lite`) | server |
+| `GEMINI_FALLBACK_MODEL` | no (default `gemini-flash-lite-latest`) | server |
 | `PORT` | no (default `5000`) | server |
 
 `.env` is git-ignored. Never commit real keys.
