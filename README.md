@@ -121,7 +121,7 @@ A commission disclosure is shown under every set of suggestions.
 - **AI limits (every plan).** 10 AI requests per minute and 100 per day per user
   (day resets at midnight Philippine time). Change them in `AI_RATE_LIMITS` in
   [`shared/plans.ts`](shared/plans.ts).
-- **English / Taglish.** The EN/TL switch (sidebar and top bar) changes the main
+- **English / Taglish.** The EN/TL switch (app sidebar; the public homepage stays English) changes the main
   interface text and makes every AI answer reply in Taglish. Translations live in
   [`client/src/lib/i18n.tsx`](client/src/lib/i18n.tsx); untranslated text falls
   back to English.
