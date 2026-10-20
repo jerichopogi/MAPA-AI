@@ -33,6 +33,10 @@ Supabase project (about 5 minutes, free tier is fine).
      npm run db:link          # pick your project
      npm run db:push          # applies supabase/migrations
      ```
+   > The **Direct connection** string (`db.<ref>.supabase.co`) is IPv6-only. On
+   > networks without IPv6 (most Philippine ISPs), use the **Session pooler**
+   > string from the dashboard's **Connect** button instead
+   > (`postgres.<ref>@aws-0-<region>.pooler.supabase.com:5432`).
 3. **Add your keys.** Go to *Project Settings → API* and copy them into `.env`:
    ```
    VITE_SUPABASE_URL=https://<project-ref>.supabase.co
