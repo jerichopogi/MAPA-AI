@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation } from "wouter";
+import { useLocation, useSearch } from "wouter";
 import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
 import { generateTripSchema, type AiResult, type GenerateTripInput, type GeneratedTrip } from "@shared/schema";
 import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MONTHS, PREFERENCES } from "@shared/reference-data";
@@ -19,6 +19,22 @@ import { useCreateTrip } from "@/hooks/use-trips";
 import { aiApi } from "@/lib/api";
 import { tripPath } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+
+/** Read ?country=&month=&days=&budget= sent by the landing-page search bar. */
+function prefillFromQuery(search: string): Partial<GenerateTripInput> {
+  const q = new URLSearchParams(search);
+  const num = (key: string, min: number, max: number) => {
+    const n = Number(q.get(key));
+    return Number.isInteger(n) && n >= min && n <= max ? n : undefined;
+  };
+  const country = q.get("country") ?? "";
+  return {
+    destinationCountry: COUNTRIES.some((c) => c.code === country) ? country : undefined,
+    travelMonth: num("month", 1, 12),
+    duration: num("days", 1, 30),
+    budget: num("budget", 1, 100_000_000),
+  };
+}
 
 function Chip({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -45,16 +61,17 @@ export default function PlanTrip() {
   const { toast } = useToast();
   const [result, setResult] = useState<{ input: GenerateTripInput; response: AiResult<GeneratedTrip> } | null>(null);
   const createTrip = useCreateTrip();
+  const prefill = prefillFromQuery(useSearch());
 
   const form = useForm<GenerateTripInput>({
     resolver: zodResolver(generateTripSchema),
     defaultValues: {
       originAirport: "MNL",
-      destinationCountry: "",
-      travelMonth: ((new Date().getMonth() + 1) % 12) + 1,
+      destinationCountry: prefill.destinationCountry ?? "",
+      travelMonth: prefill.travelMonth ?? ((new Date().getMonth() + 1) % 12) + 1,
       currency: "PHP",
-      duration: 5,
-      budget: 50000,
+      duration: prefill.duration ?? 5,
+      budget: prefill.budget ?? 50000,
       preferences: [],
       selectedCities: [],
     },

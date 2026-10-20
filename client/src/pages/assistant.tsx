@@ -52,7 +52,7 @@ export default function Assistant() {
     <div className="flex min-h-[calc(100vh-10rem)] flex-col">
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold sm:text-3xl">Assistant</h1>
+          <h1 className="display text-3xl sm:text-4xl">Assistant</h1>
           <p className="mt-1.5 text-muted-foreground">Ask anything about your next trip.</p>
         </div>
         {source && <AiSourceBadge source={source} />}

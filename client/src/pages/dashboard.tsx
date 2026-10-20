@@ -28,7 +28,7 @@ export default function Dashboard() {
     <div className="space-y-12">
       <section>
         <p className="text-sm text-muted-foreground">{greeting()},</p>
-        <h1 className="mt-1 text-3xl font-semibold">{displayName.split(" ")[0]} — where to next?</h1>
+        <h1 className="display mt-1 text-4xl">{displayName.split(" ")[0]} — where to next?</h1>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

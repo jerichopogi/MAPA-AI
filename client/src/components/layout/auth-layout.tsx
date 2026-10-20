@@ -10,7 +10,7 @@ export function AuthLayout({ title, description, children }: { title: string; de
       <div className="flex flex-col px-4 py-6 sm:px-8">
         <Logo />
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
-          <h1 className="text-2xl font-semibold">{title}</h1>
+          <h1 className="display text-3xl">{title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{description}</p>
           <SetupNotice className="mt-6" />
           <div className="mt-8">{children}</div>

@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", ...fontFamily.sans],
+        sans: ["\"DM Sans\"", ...fontFamily.sans],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -44,6 +44,10 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        brand: {
+          DEFAULT: "hsl(var(--brand))",
+          foreground: "hsl(var(--brand-foreground))",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

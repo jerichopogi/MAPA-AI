@@ -18,7 +18,7 @@ export function ProtectedRoute({ component: Component }: { component: ComponentT
   }
 
   if (!user) {
-    const next = encodeURIComponent(window.location.pathname);
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
     return <Redirect to={`${Routes.LOGIN}?next=${next}`} />;
   }
 

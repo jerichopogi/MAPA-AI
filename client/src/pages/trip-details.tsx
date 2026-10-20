@@ -125,7 +125,7 @@ export default function TripDetails() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 text-white sm:p-8">
           <TripStatusBadge status={trip.status} />
-          <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">{trip.name}</h1>
+          <h1 className="display mt-3 text-3xl sm:text-4xl">{trip.name}</h1>
         </div>
       </div>
 

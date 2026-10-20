@@ -5,47 +5,52 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    --foreground: 200 18% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
+    --card-foreground: 200 18% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
-    --primary: 189 82% 29%;
+    --popover-foreground: 200 18% 10%;
+    --primary: 194 50% 21%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 44%;
-    --accent: 189 55% 95%;
-    --accent-foreground: 189 82% 22%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 200 18% 10%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 200 6% 40%;
+    --accent: 194 28% 93%;
+    --accent-foreground: 194 50% 21%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 91%;
-    --input: 240 6% 88%;
-    --ring: 189 82% 29%;
-    --radius: 0.75rem;
+    --border: 0 0% 90%;
+    --input: 0 0% 87%;
+    --ring: 194 50% 21%;
+    /* Deep teal brand surface (footer, highlighted cards); stays dark in both themes. */
+    --brand: 194 50% 21%;
+    --brand-foreground: 0 0% 100%;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 98%;
-    --card: 240 7% 7%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 7% 7%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 188 62% 56%;
-    --primary-foreground: 240 10% 4%;
-    --secondary: 240 4% 13%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 4% 13%;
-    --muted-foreground: 240 5% 65%;
-    --accent: 189 35% 14%;
-    --accent-foreground: 188 62% 72%;
+    --background: 200 18% 6%;
+    --foreground: 0 0% 96%;
+    --card: 200 15% 9%;
+    --card-foreground: 0 0% 96%;
+    --popover: 200 15% 9%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 189 42% 62%;
+    --primary-foreground: 200 18% 8%;
+    --secondary: 200 12% 13%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 200 12% 12%;
+    --muted-foreground: 200 6% 64%;
+    --accent: 194 30% 15%;
+    --accent-foreground: 189 42% 72%;
     --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 16%;
-    --input: 240 4% 20%;
-    --ring: 188 62% 56%;
+    --border: 200 10% 17%;
+    --input: 200 10% 21%;
+    --ring: 189 42% 62%;
+    --brand: 194 45% 17%;
+    --brand-foreground: 0 0% 98%;
   }
 
   * {
@@ -58,11 +63,15 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "cv11", "ss01";
   }
 
   h1, h2, h3, h4 {
     @apply tracking-tight;
+  }
+
+  /* Display headings are thin, as in the reference design. */
+  .display {
+    @apply font-light tracking-[-0.03em];
   }
 }
 
@@ -73,7 +82,17 @@
   }
 
   .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.14em] text-primary;
+    @apply text-xs font-medium text-muted-foreground;
+  }
+
+  /* Soft floating card used across the site. */
+  .card-soft {
+    @apply rounded-2xl bg-card shadow-[0_8px_30px_-12px_rgba(16,40,48,0.18)] dark:shadow-none dark:ring-1 dark:ring-border;
+  }
+
+  /* Round icon button with an arrow, from the reference. */
+  .arrow-btn {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand text-brand-foreground transition-transform hover:-rotate-12;
   }
 }
 
