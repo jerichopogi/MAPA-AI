@@ -85,6 +85,25 @@ live in [`shared/plans.ts`](shared/plans.ts).
    PayMongo → Developers → Webhooks pointing to `https://<your-domain>/api/billing/webhook`
    with the event `checkout_session.payment.paid`. Put its secret in `PAYMONGO_WEBHOOK_SECRET`.
 
+## 4. Affiliate commissions (optional)
+
+Every AI trip includes **suggested flights, stays and activities**. The AI only
+names what to book; the app builds the links in
+[client/src/lib/affiliates.ts](client/src/lib/affiliates.ts), so they always go to
+the real partner site with your partner ID:
+
+| Partner | Used for | Sign up | Setting |
+|---|---|---|---|
+| Agoda | Hotels | Agoda Partners | `VITE_AGODA_CID` |
+| Booking.com | Hotels | Booking.com Affiliate Partner Programme | `VITE_BOOKING_AID` |
+| Klook | Tours & activities | Klook Affiliate Program | `VITE_KLOOK_AID` |
+| Cebu Pacific, AirAsia | Flights | Usually via an affiliate network (e.g. Involve Asia) | `VITE_CEBUPACIFIC_LINK`, `VITE_AIRASIA_LINK` |
+
+After approval, open each partner's deep-link tool and, if its format differs
+from the default, paste it into the matching `*_LINK` setting
+(placeholders: `{query}`, `{from}`, `{to}`, `{id}`, `{url}`). Restart `npm run dev`.
+A commission disclosure is shown under every set of suggestions.
+
 ## Scripts
 
 | Command | What it does |

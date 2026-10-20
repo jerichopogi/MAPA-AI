@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { ZodError, type ZodType, type ZodTypeDef } from "zod";
-import { chatSchema, generateTripSchema, localSecretsQuerySchema, visaQuerySchema } from "@shared/schema";
+import { chatSchema, destinationIdeasSchema, generateTripSchema, localSecretsQuerySchema, visaQuerySchema } from "@shared/schema";
 import { isGeminiConfigured, isSupabaseConfigured, paymentProvider } from "./config";
 import { requireAuth } from "./middleware/auth";
 import * as ai from "./ai";
@@ -32,6 +32,7 @@ api.post("/ai/generate-trip", requireAuth, quota("trip"), aiRoute(generateTripSc
 api.post("/ai/visa", requireAuth, quota("visa"), aiRoute(visaQuerySchema, ai.visaRequirements));
 api.post("/ai/local-secrets", requireAuth, quota("local"), aiRoute(localSecretsQuerySchema, ai.localSecrets));
 api.post("/ai/chat", requireAuth, quota("chat"), aiRoute(chatSchema, ai.chat));
+api.post("/ai/destination-ideas", requireAuth, quota("ideas"), aiRoute(destinationIdeasSchema, ai.destinationIdeas));
 
 api.use("/billing", billing);
 

@@ -1,6 +1,8 @@
 import type {
   AiResult,
   ChatInput,
+  DestinationIdea,
+  DestinationIdeasInput,
   GenerateTripInput,
   GeneratedTrip,
   LocalPlace,
@@ -67,6 +69,7 @@ export const aiApi = {
   visa: (input: VisaQueryInput) => aiRequest<AiResult<VisaRequirement>>("/ai/visa", input),
   localSecrets: (input: LocalSecretsQueryInput) => aiRequest<AiResult<LocalPlace[]>>("/ai/local-secrets", input),
   chat: (input: ChatInput) => aiRequest<AiResult<string>>("/ai/chat", input),
+  destinationIdeas: (input: DestinationIdeasInput) => aiRequest<AiResult<DestinationIdea[]>>("/ai/destination-ideas", input),
 };
 
 export const billingApi = {

@@ -147,6 +147,12 @@ export const CITIES_BY_COUNTRY: Record<string, Option[]> = {
   ],
 };
 
+/** Main international arrival airport per destination (for flight suggestions). */
+export const MAIN_AIRPORT: Record<string, string> = {
+  JPN: "NRT", KOR: "ICN", SGP: "SIN", THA: "BKK", VNM: "HAN", MYS: "KUL", IDN: "DPS", HKG: "HKG",
+  TWN: "TPE", AUS: "SYD", USA: "LAX", CAN: "YVR", GBR: "LHR", FRA: "CDG", ITA: "FCO", ESP: "MAD",
+};
+
 export const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",

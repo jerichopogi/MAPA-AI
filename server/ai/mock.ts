@@ -1,7 +1,10 @@
 // Realistic sample responses used when GEMINI_API_KEY is not set, so every
 // AI feature can be built and demoed without an API key.
 import type {
+  BookingSuggestions,
   DailyPlan,
+  DestinationIdea,
+  DestinationIdeasInput,
   GenerateTripInput,
   GeneratedTrip,
   Itinerary,
@@ -10,7 +13,7 @@ import type {
   VisaQueryInput,
   VisaRequirement,
 } from "@shared/schema";
-import { CITIES_BY_COUNTRY, cityName, countryName, monthName } from "@shared/reference-data";
+import { CITIES_BY_COUNTRY, MAIN_AIRPORT, cityName, countryName, monthName } from "@shared/reference-data";
 
 // --- Trips ------------------------------------------------------------------
 
@@ -91,7 +94,74 @@ export function mockTrip(input: GenerateTripInput): GeneratedTrip {
     tripName: `${input.duration} days in ${cities.join(" & ")} · ${monthName(input.travelMonth)}`,
     budgetItinerary: buildItinerary(input, cities, "budget"),
     experienceItinerary: buildItinerary(input, cities, "experience"),
+    bookings: mockBookings(input, cities),
   };
+}
+
+/** Budget carriers fly these from the Philippines; long-haul falls back to Philippine Airlines. */
+const BUDGET_CARRIER_COUNTRIES = new Set(["JPN", "KOR", "SGP", "THA", "VNM", "MYS", "IDN", "HKG", "TWN", "AUS"]);
+
+function mockBookings(input: GenerateTripInput, cities: string[]): BookingSuggestions {
+  const to = MAIN_AIRPORT[input.destinationCountry] ?? "";
+  const fare = round(input.budget * 0.3);
+  const flights = BUDGET_CARRIER_COUNTRIES.has(input.destinationCountry)
+    ? [
+        { airline: "Cebu Pacific", from: input.originAirport, to, estimatedFare: fare, note: "Usually the cheapest; add baggage when booking, it costs more at the airport." },
+        { airline: "AirAsia", from: input.originAirport, to, estimatedFare: round(fare * 1.08), note: "Watch for seat sales; good if Cebu Pacific times don't suit you." },
+      ]
+    : [{ airline: "Philippine Airlines", from: input.originAirport, to, estimatedFare: round(fare * 1.6), note: "Full-service with checked baggage included." }];
+  const [first, second = first] = cities;
+  return {
+    flights,
+    stays: [
+      { name: `${first} Central Hostel`, city: first, area: "City centre", style: "budget", pricePerNight: round(input.budget * 0.04), why: "Walkable to the main sights and the train station." },
+      { name: `Hotel ${second} Station`, city: second, area: "Near the main station", style: "budget", pricePerNight: round(input.budget * 0.06), why: "Easy airport transfers and day trips." },
+      { name: `The ${first} Grand`, city: first, area: "Upscale district", style: "experience", pricePerNight: round(input.budget * 0.12), why: "Great views, breakfast included, near nightlife." },
+    ],
+    activities: [
+      { name: `${first} city pass`, city: first, price: round(input.budget * 0.05), why: "Covers transport and top attractions in one ticket." },
+      { name: `${first} street food tour`, city: first, price: round(input.budget * 0.04), why: "Taste local dishes with a guide who knows the stalls." },
+      { name: `Day trip from ${second}`, city: second, price: round(input.budget * 0.06), why: "See the countryside without planning transport." },
+    ],
+  };
+}
+
+// --- Destination ideas ---------------------------------------------------------
+
+/** Rough best months, highlights and daily cost (PHP, excl. flights) per destination. */
+const SEASONS: { code: string; city: string; months: number[]; weather: string; happening: string; visa: string; perDay: number; fare: number }[] = [
+  { code: "JPN", city: "Tokyo", months: [3, 4, 10, 11], weather: "Mild and dry, 12-20°C", happening: "Cherry blossoms (late Mar-Apr) or autumn leaves (Nov)", visa: "Visa required (free, via agency)", perDay: 6500, fare: 14000 },
+  { code: "KOR", city: "Seoul", months: [4, 5, 9, 10], weather: "Cool and clear, 10-22°C", happening: "Spring blossoms or autumn foliage season", visa: "Visa required (free up to 59 days)", perDay: 5500, fare: 12000 },
+  { code: "TWN", city: "Taipei", months: [10, 11, 12, 3], weather: "Comfortable, 18-25°C", happening: "Night-market season; hot-spring weather in winter", visa: "Check eligibility for visa-free entry", perDay: 4500, fare: 9000 },
+  { code: "THA", city: "Bangkok", months: [11, 12, 1, 2], weather: "Dry season, 25-32°C", happening: "Loy Krathong (Nov) and cooler, dry days", visa: "Visa-free (ASEAN)", perDay: 3500, fare: 8000 },
+  { code: "VNM", city: "Hanoi", months: [3, 4, 10, 11], weather: "Warm and dry, 20-28°C", happening: "Best light for Ha Long Bay cruises", visa: "Visa-free up to 21 days", perDay: 3000, fare: 9000 },
+  { code: "SGP", city: "Singapore", months: [2, 3, 4, 7, 8], weather: "Hot and humid year-round, ~31°C", happening: "Great Singapore Sale (Jun-Jul), Chinese New Year lights", visa: "Visa-free up to 30 days", perDay: 7000, fare: 7000 },
+  { code: "MYS", city: "Kuala Lumpur", months: [5, 6, 7, 8], weather: "Drier mid-year, ~32°C", happening: "Food festivals and mega-sales season", visa: "Visa-free up to 30 days", perDay: 3500, fare: 7000 },
+  { code: "IDN", city: "Bali", months: [5, 6, 7, 8, 9], weather: "Dry season, sunny, ~30°C", happening: "Best beach and rice-terrace weather", visa: "Visa-free (ASEAN)", perDay: 4000, fare: 10000 },
+  { code: "HKG", city: "Hong Kong", months: [10, 11, 12], weather: "Cool and clear, 18-25°C", happening: "Wine & Dine Festival, Christmas lights", visa: "Visa-free up to 14 days", perDay: 6000, fare: 6000 },
+  { code: "AUS", city: "Sydney", months: [9, 10, 11, 3, 4], weather: "Spring/autumn, 18-25°C", happening: "Spring festivals and whale-watching season", visa: "Visitor visa required", perDay: 9000, fare: 25000 },
+];
+
+export function mockDestinationIdeas(input: DestinationIdeasInput): DestinationIdea[] {
+  const month = Number(input.date.slice(5, 7));
+  const cost = (s: (typeof SEASONS)[number]) => s.fare + s.perDay * input.days;
+  const inSeason = (s: (typeof SEASONS)[number]) => Number(s.months.includes(month));
+  const overBudget = (s: (typeof SEASONS)[number]) => Number(cost(s) > input.budget);
+  return [...SEASONS]
+    .sort((a, b) => inSeason(b) - inSeason(a) || overBudget(a) - overBudget(b) || cost(a) - cost(b))
+    .slice(0, 4)
+    .map((s) => ({
+      countryCode: s.code,
+      country: countryName(s.code),
+      city: s.city,
+      why: inSeason(s)
+        ? `${monthName(month)} is one of the best months for ${s.city}.`
+        : `Shoulder season in ${s.city}: fewer crowds and lower prices.`,
+      weather: s.weather,
+      happening: s.happening,
+      visa: s.visa,
+      estimatedBudget: round(cost(s)),
+    }));
 }
 
 // --- Visa -------------------------------------------------------------------

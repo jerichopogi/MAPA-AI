@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { ArrowRight, Luggage, MapPinned, MessageCircle, Sparkles, Stamp } from "lucide-react";
+import { DestinationIdeas } from "@/components/destination-ideas";
 import { EmptyState } from "@/components/empty-state";
 import { TripCard, TripCardSkeleton } from "@/components/trips/trip-card";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,8 @@ export default function Dashboard() {
           </Link>
         ))}
       </section>
+
+      <DestinationIdeas />
 
       <section>
         <div className="mb-4 flex items-center justify-between">

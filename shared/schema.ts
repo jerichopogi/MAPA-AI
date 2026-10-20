@@ -30,6 +30,14 @@ export const localSecretsQuerySchema = z.object({
 });
 export type LocalSecretsQueryInput = z.infer<typeof localSecretsQuerySchema>;
 
+export const destinationIdeasSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date"),
+  days: z.number().int().min(1).max(30),
+  budget: z.number().int().min(1000),
+  interests: z.string().array().max(8).default([]),
+});
+export type DestinationIdeasInput = z.infer<typeof destinationIdeasSchema>;
+
 export const chatSchema = z.object({
   messages: z
     .array(
@@ -74,10 +82,55 @@ export interface Itinerary {
   totalCost: number;
 }
 
+/** What the AI suggests booking. The app turns these into partner (affiliate) links. */
+export interface FlightSuggestion {
+  airline: string;
+  /** IATA airport codes, e.g. MNL → NRT. */
+  from: string;
+  to: string;
+  estimatedFare: number;
+  note: string;
+}
+
+export interface StaySuggestion {
+  name: string;
+  city: string;
+  area: string;
+  style: "budget" | "experience";
+  pricePerNight: number;
+  why: string;
+}
+
+export interface ActivitySuggestion {
+  name: string;
+  city: string;
+  price: number;
+  why: string;
+}
+
+export interface BookingSuggestions {
+  flights: FlightSuggestion[];
+  stays: StaySuggestion[];
+  activities: ActivitySuggestion[];
+}
+
 export interface GeneratedTrip {
   tripName: string;
   budgetItinerary: Itinerary;
   experienceItinerary: Itinerary;
+  bookings?: BookingSuggestions;
+}
+
+/** One ranked destination from "Where should I go?". */
+export interface DestinationIdea {
+  countryCode: string;
+  country: string;
+  city: string;
+  why: string;
+  weather: string;
+  happening: string;
+  visa: string;
+  estimatedBudget: number;
 }
 
 export interface VisaRequirement {

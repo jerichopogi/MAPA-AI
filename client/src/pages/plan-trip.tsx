@@ -9,6 +9,7 @@ import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MONTHS, PREFERENCES
 import { AiSourceBadge } from "@/components/ai-source-badge";
 import { PageHeader } from "@/components/layout/app-shell";
 import { PreferenceIcon } from "@/components/preference-icon";
+import { BookingSuggestions } from "@/components/trips/booking-suggestions";
 import { ItineraryView } from "@/components/trips/itinerary-view";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -108,6 +109,7 @@ export default function PlanTrip() {
         preferences: input.preferences,
         budgetItinerary: response.data.budgetItinerary,
         experienceItinerary: response.data.experienceItinerary,
+        bookingSuggestions: response.data.bookings ?? null,
       });
       toast({ title: "Trip saved", description: "Find it any time under My trips." });
       navigate(tripPath(trip.id));
@@ -144,6 +146,12 @@ export default function PlanTrip() {
           currency={input.currency}
           budget={input.budget}
         />
+        {response.data.bookings && (
+          <section className="mt-12">
+            <h2 className="mb-4 text-lg font-medium">Book this trip</h2>
+            <BookingSuggestions bookings={response.data.bookings} currency={input.currency} />
+          </section>
+        )}
       </>
     );
   }

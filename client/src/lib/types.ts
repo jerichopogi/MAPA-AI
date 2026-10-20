@@ -1,4 +1,4 @@
-import type { Itinerary } from "@shared/schema";
+import type { BookingSuggestions, Itinerary } from "@shared/schema";
 
 export type TripStatus = "upcoming" | "completed" | "cancelled";
 
@@ -17,6 +17,7 @@ export interface Trip {
   status: TripStatus;
   budgetItinerary: Itinerary | null;
   experienceItinerary: Itinerary | null;
+  bookingSuggestions: BookingSuggestions | null;
   notes: string;
   createdAt: string;
 }

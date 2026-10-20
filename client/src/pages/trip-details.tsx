@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "wouter";
 import { ArrowLeft, ExternalLink, Hotel, Loader2, Plane, Printer, Ticket, Trash2 } from "lucide-react";
+import { MAIN_AIRPORT } from "@shared/reference-data";
 import { airportName, cityName, countryName, monthName, preferenceName } from "@shared/reference-data";
 import { EmptyState } from "@/components/empty-state";
+import { BookingSuggestions } from "@/components/trips/booking-suggestions";
 import { ItineraryView } from "@/components/trips/itinerary-view";
+import { partnerLink } from "@/lib/affiliates";
 import { TripStatusBadge } from "@/components/trips/trip-status-badge";
 import {
   AlertDialog,
@@ -27,11 +30,11 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 
 function bookingLinks(trip: Trip) {
   const where = trip.selectedCities.length ? cityName(trip.destinationCountry, trip.selectedCities[0]) : countryName(trip.destinationCountry);
-  const q = encodeURIComponent(where);
   return [
-    { icon: Plane, label: "Flights", href: `https://www.google.com/travel/flights?q=${encodeURIComponent(`flights from ${trip.originAirport} to ${where}`)}` },
-    { icon: Hotel, label: "Stays", href: `https://www.booking.com/searchresults.html?ss=${q}` },
-    { icon: Ticket, label: "Activities", href: `https://www.klook.com/en-PH/search/result/?query=${q}` },
+    { icon: Plane, label: "Flights", href: partnerLink("googleflights", { from: trip.originAirport, to: MAIN_AIRPORT[trip.destinationCountry] ?? where }) },
+    { icon: Hotel, label: "Stays on Agoda", href: partnerLink("agoda", { query: where }) },
+    { icon: Hotel, label: "Stays on Booking.com", href: partnerLink("booking", { query: where }) },
+    { icon: Ticket, label: "Activities on Klook", href: partnerLink("klook", { query: where }) },
   ];
 }
 
@@ -204,6 +207,13 @@ export default function TripDetails() {
         </section>
       ) : null}
 
+      {trip.bookingSuggestions && (
+        <section className="no-print">
+          <h2 className="mb-4 text-lg font-semibold">Book this trip</h2>
+          <BookingSuggestions bookings={trip.bookingSuggestions} currency={trip.currency} />
+        </section>
+      )}
+
       <section className="grid gap-4 lg:grid-cols-[1fr_18rem] no-print">
         <Notes trip={trip} />
         <div className="rounded-xl border bg-card p-5">
@@ -211,7 +221,7 @@ export default function TripDetails() {
           <ul className="mt-3 space-y-1">
             {bookingLinks(trip).map(({ icon: Icon, label, href }) => (
               <li key={label}>
-                <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-muted">
+                <a href={href} target="_blank" rel="sponsored noopener noreferrer" className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-muted">
                   <Icon className="h-4 w-4 text-muted-foreground" />
                   <span className="flex-1">{label}</span>
                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />

@@ -1,6 +1,6 @@
 // Plans, prices and Free-plan limits — shared by the pricing page and the server.
 
-export type AiFeature = "trip" | "visa" | "local" | "chat";
+export type AiFeature = "trip" | "visa" | "local" | "chat" | "ideas";
 export type ProductId = "plus_30d" | "plus_365d";
 
 export interface Product {

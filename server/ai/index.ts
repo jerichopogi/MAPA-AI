@@ -3,6 +3,8 @@
 import type {
   AiResult,
   ChatInput,
+  DestinationIdea,
+  DestinationIdeasInput,
   GenerateTripInput,
   GeneratedTrip,
   LocalPlace,
@@ -13,7 +15,8 @@ import type {
 import { isGeminiConfigured } from "../config";
 import * as gemini from "./gemini";
 import * as mock from "./mock";
-import { localSecretsPrompt, tripPrompt, visaPrompt } from "./prompts";
+import { COUNTRIES } from "@shared/reference-data";
+import { destinationIdeasPrompt, localSecretsPrompt, tripPrompt, visaPrompt } from "./prompts";
 
 async function run<T>(live: () => Promise<T>, fallback: () => T): Promise<AiResult<T>> {
   if (!isGeminiConfigured) {
@@ -40,4 +43,16 @@ export const chat = (input: ChatInput) =>
   run<string>(
     () => gemini.chat(input.messages),
     () => mock.mockChat(input.messages[input.messages.length - 1].content),
+  );
+
+const KNOWN_COUNTRIES = new Set(COUNTRIES.map((c) => c.code));
+
+export const destinationIdeas = (input: DestinationIdeasInput) =>
+  run<DestinationIdea[]>(
+    async () => {
+      const { ideas } = await gemini.generateJson<{ ideas: DestinationIdea[] }>(destinationIdeasPrompt(input));
+      // Only keep countries the planner supports, so "Plan this trip" always works.
+      return ideas.filter((i) => KNOWN_COUNTRIES.has(i.countryCode)).slice(0, 4);
+    },
+    () => mock.mockDestinationIdeas(input),
   );

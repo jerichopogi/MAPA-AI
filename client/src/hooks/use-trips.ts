@@ -18,6 +18,7 @@ interface TripRow {
   status: TripStatus;
   budget_itinerary: Trip["budgetItinerary"];
   experience_itinerary: Trip["experienceItinerary"];
+  booking_suggestions: Trip["bookingSuggestions"];
   notes: string;
   created_at: string;
 }
@@ -36,6 +37,7 @@ const fromRow = (r: TripRow): Trip => ({
   status: r.status,
   budgetItinerary: r.budget_itinerary,
   experienceItinerary: r.experience_itinerary,
+  bookingSuggestions: r.booking_suggestions,
   notes: r.notes,
   createdAt: r.created_at,
 });
@@ -88,6 +90,7 @@ export function useCreateTrip() {
           preferences: trip.preferences,
           budget_itinerary: trip.budgetItinerary,
           experience_itinerary: trip.experienceItinerary,
+          booking_suggestions: trip.bookingSuggestions,
         })
         .select()
         .single();

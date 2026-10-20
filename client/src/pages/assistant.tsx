@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ArrowUp, Loader2, Sparkles } from "lucide-react";
 import type { AiSource, ChatInput } from "@shared/schema";
 import { AiSourceBadge } from "@/components/ai-source-badge";
+import { FormattedText } from "@/components/formatted-text";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { aiApi, isQuotaError } from "@/lib/api";
@@ -11,10 +12,10 @@ import { cn } from "@/lib/utils";
 type Message = ChatInput["messages"][number];
 
 const SUGGESTIONS = [
-  "What should I pack for Seoul in December?",
+  "What customs should I follow when visiting temples in Kyoto?",
+  "What festivals happen in Thailand in November?",
+  "Which Korean dishes should I try in Busan?",
   "Is ₱40,000 enough for 4 days in Tokyo?",
-  "Best areas to stay in Bangkok for first-timers?",
-  "How early should I apply for a Japan visa?",
 ];
 
 export default function Assistant() {
@@ -53,7 +54,7 @@ export default function Assistant() {
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
           <h1 className="display text-3xl sm:text-4xl">Assistant</h1>
-          <p className="mt-1.5 text-muted-foreground">Ask anything about your next trip.</p>
+          <p className="mt-1.5 text-muted-foreground">Ask about countries, places, culture, traditions and trip planning.</p>
         </div>
         {source && <AiSourceBadge source={source} />}
       </div>
@@ -78,11 +79,11 @@ export default function Assistant() {
           <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
             <div
               className={cn(
-                "max-w-[85%] whitespace-pre-line rounded-2xl px-4 py-3 text-sm leading-relaxed",
+                "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                 m.role === "user" ? "bg-primary text-primary-foreground" : "border bg-card",
               )}
             >
-              {m.content}
+              {m.role === "assistant" ? <FormattedText text={m.content} /> : <span className="whitespace-pre-line">{m.content}</span>}
             </div>
           </div>
         ))}
@@ -112,7 +113,7 @@ export default function Assistant() {
                 submit(draft);
               }
             }}
-            placeholder="Ask about visas, budgets, packing, neighbourhoods…"
+            placeholder="Ask about a place, its culture, traditions, food or getting around…"
             rows={2}
             className="resize-none border-0 pr-14 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
           />
