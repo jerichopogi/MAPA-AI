@@ -15,6 +15,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { COUNTRIES, MONTHS } from "@shared/reference-data";
+import { PaymentMethodsNote, PricingCards } from "@/components/billing/pricing-cards";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
@@ -335,6 +336,15 @@ export default function Landing() {
               <span className="arrow-btn mt-6 bg-brand-foreground text-brand"><ArrowUpRight className="h-4 w-4" /></span>
             </div>
           </Link>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="container-page scroll-mt-8 pb-28">
+        <SectionIntro label="Pricing" title="Start Free, Upgrade Anytime" text="Pay once with GCash, Maya or card. No subscriptions, no surprise charges." />
+        <div className="mt-12">
+          <PricingCards />
+          <PaymentMethodsNote />
         </div>
       </section>
 

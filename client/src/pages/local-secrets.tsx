@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { aiApi } from "@/lib/api";
+import { aiApi, isQuotaError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 type Category = LocalSecretsQueryInput["category"];
@@ -31,7 +31,7 @@ export default function LocalSecrets() {
 
   const search = useMutation({
     mutationFn: aiApi.localSecrets,
-    onError: (error) => toast({ title: "Couldn't find places", description: error.message, variant: "destructive" }),
+    onError: (error) => !isQuotaError(error) && toast({ title: "Couldn't find places", description: error.message, variant: "destructive" }),
   });
 
   function run(nextCity = city, nextCategory = category) {

@@ -1,5 +1,6 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Route, Switch } from "wouter";
+import { UpgradeDialog } from "@/components/billing/upgrade-dialog";
 import { ProtectedRoute } from "@/components/protected-route";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
@@ -22,6 +23,10 @@ import VisaHelp from "@/pages/visa-help";
 import LocalSecrets from "@/pages/local-secrets";
 import TravelInfo from "@/pages/travel-info";
 import TravelPackage from "@/pages/travel-package";
+import Pricing from "@/pages/pricing";
+import Billing from "@/pages/billing";
+import BillingSuccess from "@/pages/billing-success";
+import TestCheckout from "@/pages/test-checkout";
 import NotFound from "@/pages/not-found";
 
 const PROTECTED = [
@@ -34,6 +39,9 @@ const PROTECTED = [
   [Routes.LOCAL_SECRETS, LocalSecrets],
   [Routes.TRAVEL_INFO, TravelInfo],
   [Routes.TRAVEL_PACKAGE, TravelPackage],
+  [Routes.BILLING_SUCCESS, BillingSuccess],
+  [Routes.BILLING, Billing],
+  [Routes.TEST_CHECKOUT, TestCheckout],
 ] as const;
 
 export default function App() {
@@ -48,6 +56,7 @@ export default function App() {
             <Route path={Routes.FORGOT_PASSWORD} component={ForgotPassword} />
             <Route path={Routes.RESET_PASSWORD} component={ResetPassword} />
             <Route path={Routes.VERIFY_EMAIL} component={VerifyEmail} />
+            <Route path={Routes.PRICING} component={Pricing} />
             {PROTECTED.map(([path, Page]) => (
               <Route key={path} path={path}>
                 <ProtectedRoute component={Page} />
@@ -55,6 +64,7 @@ export default function App() {
             ))}
             <Route component={NotFound} />
           </Switch>
+          <UpgradeDialog />
           <Toaster />
         </AuthProvider>
       </ThemeProvider>

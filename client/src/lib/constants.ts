@@ -16,6 +16,10 @@ export const Routes = {
   VISA_HELP: "/visa-help",
   TRAVEL_INFO: "/travel-info",
   TRAVEL_PACKAGE: "/travel-package",
+  PRICING: "/pricing",
+  BILLING: "/billing",
+  BILLING_SUCCESS: "/billing/success",
+  TEST_CHECKOUT: "/checkout/test",
 } as const;
 
 export const tripPath = (id: string) => `/trips/${id}`;

@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { Routes } from "@/lib/constants";
 
+// Section anchors are absolute so they also work from /pricing.
 const NAV = [
-  { href: "#top", label: "Home" },
-  { href: "#destinations", label: "Destinations" },
-  { href: "#features", label: "Features" },
-  { href: "#about", label: "About" },
+  { href: "/#top", label: "Home" },
+  { href: "/#destinations", label: "Destinations" },
+  { href: "/#features", label: "Features" },
+  { href: "/#about", label: "About" },
+  { href: "/pricing", label: "Pricing" },
 ];
 
 /** Marketing header: logo, centered pill nav, round icon buttons. Sits on the gray hero. */

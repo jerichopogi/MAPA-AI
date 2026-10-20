@@ -13,7 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { aiApi } from "@/lib/api";
+import { aiApi, isQuotaError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const PURPOSES = [
@@ -33,7 +33,7 @@ export default function VisaHelp() {
 
   const query = useMutation({
     mutationFn: aiApi.visa,
-    onError: (error) => toast({ title: "Couldn't check visa rules", description: error.message, variant: "destructive" }),
+    onError: (error) => !isQuotaError(error) && toast({ title: "Couldn't check visa rules", description: error.message, variant: "destructive" }),
   });
   const result = query.data?.data;
 

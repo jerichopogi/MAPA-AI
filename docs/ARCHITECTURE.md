@@ -55,6 +55,21 @@ for mock answers. Adding a key is the only change needed to go live.
 Gemini runs in JSON mode (`responseMimeType: "application/json"`), so responses
 parse reliably without the regex repair the old code needed.
 
+### Billing
+
+`shared/plans.ts` defines the Free limits and Plus passes. AI routes run
+`quota(feature)` after auth: Free users over their monthly limit get HTTP 402
+(`quota_exceeded`), which opens the upgrade dialog in the client; each
+successful call writes an `ai_usage` row.
+
+Checkout (`server/billing/`) creates a `payments` row, then a PayMongo Checkout
+Session (or the dev-only test checkout). A pass is activated by the
+`activate_payment()` SQL function, which is idempotent and callable only with
+the service-role key. It is triggered by the PayMongo webhook in production,
+and by `/api/billing/confirm` on the success page, which works locally where
+webhooks can't reach. Users can read, but never write, `subscriptions`,
+`payments` and `ai_usage`.
+
 ## Data model
 
 See [`supabase/migrations/`](../supabase/migrations). Summary:

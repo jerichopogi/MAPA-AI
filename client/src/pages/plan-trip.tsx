@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useLocation, useSearch } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 import { ArrowLeft, Loader2, Save, Sparkles } from "lucide-react";
 import { generateTripSchema, type AiResult, type GenerateTripInput, type GeneratedTrip } from "@shared/schema";
 import { AIRPORTS, CITIES_BY_COUNTRY, COUNTRIES, CURRENCIES, MONTHS, PREFERENCES } from "@shared/reference-data";
@@ -15,9 +15,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useBillingStatus } from "@/hooks/use-billing";
 import { useCreateTrip } from "@/hooks/use-trips";
-import { aiApi } from "@/lib/api";
-import { tripPath } from "@/lib/constants";
+import { aiApi, isQuotaError } from "@/lib/api";
+import { Routes, tripPath } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 /** Read ?country=&month=&days=&budget= sent by the landing-page search bar. */
@@ -61,6 +62,8 @@ export default function PlanTrip() {
   const { toast } = useToast();
   const [result, setResult] = useState<{ input: GenerateTripInput; response: AiResult<GeneratedTrip> } | null>(null);
   const createTrip = useCreateTrip();
+  const { data: billing } = useBillingStatus();
+  const tripsLeft = billing?.plan === "free" ? Math.max(0, billing.limits.trip - billing.usage.trip) : null;
   const prefill = prefillFromQuery(useSearch());
 
   const form = useForm<GenerateTripInput>({
@@ -86,7 +89,7 @@ export default function PlanTrip() {
       setResult({ input, response });
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    onError: (error) => toast({ title: "Couldn't generate a trip", description: error.message, variant: "destructive" }),
+    onError: (error) => !isQuotaError(error) && toast({ title: "Couldn't generate a trip", description: error.message, variant: "destructive" }),
   });
 
   async function save() {
@@ -322,7 +325,13 @@ export default function PlanTrip() {
             )}
           />
 
-          <div className="flex justify-end border-t pt-6">
+          <div className="flex flex-col-reverse items-center gap-3 border-t pt-6 sm:flex-row sm:justify-end">
+            {tripsLeft !== null && (
+              <p className="text-sm text-muted-foreground">
+                {tripsLeft} of {billing!.limits.trip} free itineraries left this month ·{" "}
+                <Link href={Routes.PRICING} className="font-medium text-primary hover:underline">Go unlimited</Link>
+              </p>
+            )}
             <Button type="submit" size="lg" disabled={generate.isPending} className="w-full sm:w-auto">
               {generate.isPending ? (
                 <>

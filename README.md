@@ -65,6 +65,26 @@ GEMINI_API_KEY=<key from https://aistudio.google.com/apikey>
 # GEMINI_FALLBACK_MODEL=gemini-flash-lite-latest  # used when the main model is busy
 ```
 
+## 3. Payments: Free and Plus plans (optional)
+
+Free users get 3 AI itineraries plus 20 other AI answers a month. **Plus** is a
+one-time pass (₱149 for 30 days, ₱1,290 for a year) paid through
+[PayMongo](https://paymongo.com) with GCash, Maya or card. Plans and prices
+live in [`shared/plans.ts`](shared/plans.ts).
+
+1. Apply [`supabase/migrations/20261020120000_billing.sql`](supabase/migrations/20261020120000_billing.sql).
+2. Add `SUPABASE_SERVICE_ROLE_KEY` to `.env` (Supabase → Project Settings → API).
+   It is server-only and is what activates plans; usage limits switch on with it.
+3. **Test without PayMongo:** leave `PAYMONGO_SECRET_KEY` empty. In development,
+   "Get Plus" opens a built-in **test checkout** where you can simulate a paid or
+   failed payment. It is disabled in production.
+4. **Test with PayMongo:** set `PAYMONGO_SECRET_KEY=sk_test_…`. Checkout redirects
+   to PayMongo's hosted page, where test payments are approved without real money.
+   Locally, the success page confirms the payment with PayMongo directly.
+5. **Production:** use your live key, set `APP_URL`, and add a webhook in
+   PayMongo → Developers → Webhooks pointing to `https://<your-domain>/api/billing/webhook`
+   with the event `checkout_session.payment.paid`. Put its secret in `PAYMONGO_WEBHOOK_SECRET`.
+
 ## Scripts
 
 | Command | What it does |
@@ -84,6 +104,11 @@ GEMINI_API_KEY=<key from https://aistudio.google.com/apikey>
 | `GEMINI_API_KEY` | no (mock data without it) | server |
 | `GEMINI_MODEL` | no (default `gemini-3.5-flash-lite`) | server |
 | `GEMINI_FALLBACK_MODEL` | no (default `gemini-flash-lite-latest`) | server |
+| `SUPABASE_SERVICE_ROLE_KEY` | for plans & limits | server only |
+| `PAYMONGO_SECRET_KEY` | for real checkout | server only |
+| `PAYMONGO_WEBHOOK_SECRET` | production | server only |
+| `PAYMONGO_METHODS` | no (default `gcash,paymaya,card`) | server |
+| `APP_URL` | production | server |
 | `PORT` | no (default `5000`) | server |
 
 `.env` is git-ignored. Never commit real keys.

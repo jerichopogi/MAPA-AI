@@ -5,7 +5,7 @@ import type { AiSource, ChatInput } from "@shared/schema";
 import { AiSourceBadge } from "@/components/ai-source-badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { aiApi } from "@/lib/api";
+import { aiApi, isQuotaError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 type Message = ChatInput["messages"][number];

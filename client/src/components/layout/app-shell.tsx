@@ -9,9 +9,11 @@ import {
   MessageCircle,
   Package,
   Plus,
+  Sparkles,
   Stamp,
   Luggage,
 } from "lucide-react";
+import { PlanCard } from "@/components/billing/plan-card";
 import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -29,6 +31,7 @@ const NAV = [
   { href: Routes.LOCAL_SECRETS, label: "Local secrets", icon: MapPinned },
   { href: Routes.TRAVEL_INFO, label: "Travel info", icon: BookOpen },
   { href: Routes.TRAVEL_PACKAGE, label: "Package quote", icon: Package },
+  { href: Routes.BILLING, label: "Plan & billing", icon: Sparkles },
 ];
 
 /** The four destinations shown in the mobile bottom bar. */
@@ -93,7 +96,7 @@ function UserMenu() {
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <div className="flex h-full flex-col gap-6 p-4">
+    <div className="flex h-full flex-col gap-6 overflow-y-auto p-4">
       <div className="flex items-center justify-between px-1">
         <Logo href={Routes.DASHBOARD} />
         <ThemeToggle />
@@ -104,8 +107,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </Link>
       </Button>
       <NavLinks onNavigate={onNavigate} />
-      <div className="mt-auto border-t pt-4">
-        <UserMenu />
+      <div className="mt-auto space-y-4">
+        <PlanCard onNavigate={onNavigate} />
+        <div className="border-t pt-4">
+          <UserMenu />
+        </div>
       </div>
     </div>
   );

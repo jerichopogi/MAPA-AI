@@ -17,6 +17,7 @@ const COLUMNS = [
     links: [
       { label: "Travel info", href: Routes.TRAVEL_INFO },
       { label: "Package quotes", href: Routes.TRAVEL_PACKAGE },
+      { label: "Pricing", href: Routes.PRICING },
     ],
   },
   {
