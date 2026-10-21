@@ -12,3 +12,6 @@ dist
 # Supabase CLI local state
 supabase/.temp
 supabase/.branches
+
+# graphify knowledge graph output (local only)
+graphify-out/
