@@ -6,10 +6,7 @@
   "functions": {
     "api/index.js": {
       "maxDuration": 60,
-      "includeFiles": [
-        "dist/vercel.cjs",
-        "dist/public/index.html"
-      ]
+      "includeFiles": "dist/{vercel.cjs,public/index.html}"
     }
   },
   "rewrites": [
