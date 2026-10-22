@@ -126,6 +126,23 @@ A commission disclosure is shown under every set of suggestions.
   [`client/src/lib/i18n.tsx`](client/src/lib/i18n.tsx); untranslated text falls
   back to English.
 
+## Deploy to Vercel
+
+Import the repository with its root directory set to the repository root.
+The checked-in `vercel.json` selects the Vite frontend in `dist/public`,
+routes `/api/*` to the Express function, and supports direct links to app pages.
+Shared-trip links also pass through the function for social previews.
+The Node server bundle in `dist/index.js` is for standalone hosting and must
+not be served as the site's homepage.
+
+Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel's environment
+settings before building. Add the other service keys as needed, and set
+`APP_URL` to the production URL. Allow that URL in Supabase's authentication
+redirect settings. Changing `VITE_*` values requires a new build.
+
+The persistent server's hourly reminder timer does not run in the Vercel
+function; automatic reminder emails require a separately scheduled worker.
+
 ## Scripts
 
 | Command | What it does |
