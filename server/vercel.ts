@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { app } from "../server/app";
-import { config } from "../server/config";
-import { withShareMeta } from "../server/share-meta";
+import { app } from "./app";
+import { config } from "./config";
+import { withShareMeta } from "./share-meta";
 
 // Vercel invokes this app per request; it must not open a listening socket
 // or start the persistent server's background reminder timers.
